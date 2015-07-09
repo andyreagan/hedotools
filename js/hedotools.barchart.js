@@ -1,21 +1,98 @@
+hedotools.barchartoncall = function() {
+    var test = function(d,i) {
+	// console.log(i);
+	i = indices[i];
+	if (stateSelType) {
+	    shiftComp = i;
+	    d3.select(".complabel").text(allData[i].name);
+	    compencoder.varval(allData[i].name);
+	}
+	else {
+	    shiftRef = i;
+	    d3.select(".reflabel").text(allData[i].name);
+	    refencoder.varval(allData[i].name);
+	}
+
+	if (shiftRef !== shiftComp) {
+	    hedotools.shifter.shift(allData[shiftRef].freq,allData[shiftComp].freq,lens,words);
+	    var happysad = hedotools.shifter._compH() > hedotools.shifter._refH() ? "happier" : "less happy";
+	    hedotools.shifter.setfigure(d3.select('#shift01')).setText(["Why "+allData[shiftComp].name+" is "+happysad+" than "+allData[shiftRef].name+":"]).plot();
+	}
+    }
+    var opublic = { test: test,
+		  };
+    return opublic;
+}();
+
 // make the plot
 hedotools.barchart = function() {
     var figure;
 
     var setfigure = function(_) {
-	console.log("setting figure");
+	// console.log("setting figure");
 	figure = _;
 	return hedotools.barchart;
     }
 
+    var xlabeltext = "Happiness difference from US as a whole";
+    var _xlabeltext = function(_) {
+	if (!arguments.length) return xlabeltext;
+	xlabeltext = _;
+	return hedotools.barchart;
+    }
+
     var data;
+    var datanames;
     var geodata;
 
     var setdata = function(a,b) {
 	data = a;
 	geodata = b;
+	datanames = Array(geodata.length);
+	for (var i=0; i<geodata.length; i++) {
+	    datanames[i] = geodata[i].properties.name;
+	}
 	return hedotools.barchart;
     }
+    
+    var _data = function(_) {
+	if (!arguments.length) return data;
+	data = _;
+	return hedotools.barchart;
+    }
+
+    var _datanames = function(_) {
+	if (!arguments.length) return datanames;
+	datanames = _;
+	return hedotools.barchart;
+    }
+    
+    var figheight = 730;
+    var _figheight = function(_) {
+	if (!arguments.length) return figheight;
+	figheight = _;
+	return hedotools.barchart;
+    }
+
+    var manualTicks = [];
+    var _manualTicks = function(_) {
+	if (!arguments.length) return manualTicks;
+	manualTicks = _;
+	return hedotools.barchart;
+    }
+
+    var sortedStates;
+    var getSorted = function(_) {
+	if (!arguments.length) return sortedStates.map(function(d) { return d[2]; });
+	if (_) {
+	    return sortedStates.map(function(d,i) { return (i+1)+". "+d[2]; });
+	}
+	else {
+	    return sortedStates.map(function(d) { return d[2]; });
+	}
+	return hedotools.barchart;
+    }
+
 
     var plot = function() {
 	/* plot the bar chart
@@ -30,7 +107,6 @@ hedotools.barchart = function() {
 	var figwidth = parseInt(figure.style('width')) - margin.left - margin.right;
 	// aspectRatio = 1.9,
 	// figheight = parseInt(d3.select('#barChart').style('width'))*aspectRatio - margin.top - margin.bottom,
-	var figheight = 730;
 	var width = figwidth-axeslabelmargin.left-axeslabelmargin.right;
 	var height = figheight-axeslabelmargin.top-axeslabelmargin.bottom;
 	var figcenter = width/2;
@@ -43,9 +119,9 @@ hedotools.barchart = function() {
 	// indices.sort(function(a,b) { return Math.abs(data[a]) < Math.abs(data[b]) ? 1 : Math.abs(data[a]) > Math.abs(data[b]) ? -1 : 0; });
 	// sort by magnitude, parity preserving
 	indices.sort(function(a,b) { return data[a] < data[b] ? 1 : data[a] > data[b] ? -1 : 0; });
-	var sortedStates = Array(data.length);
-	for (var i = 0; i < data.length; i++) { sortedStates[i] = [i,indices[i],geodata[indices[i]].properties.name,data[indices[i]]]; }
-	console.log(sortedStates);
+	sortedStates = Array(data.length);
+	for (var i = 0; i < data.length; i++) { sortedStates[i] = [i,indices[i],datanames[indices[i]],data[indices[i]]]; }
+	// console.log(sortedStates);
 
 	// remove an old figure if it exists
 	figure.select(".canvas").remove();
@@ -54,6 +130,7 @@ hedotools.barchart = function() {
 	    .attr("width",figwidth)
 	    .attr("height",figheight)
 	    .attr("class","canvas")
+	    .attr("id","barchartsvg");
 
 	// x scale, maps all the data to 
 	var absDataMax = d3.max([d3.max(data),-d3.min(data)]);
@@ -124,9 +201,18 @@ hedotools.barchart = function() {
 	// 	.attr("transform", "translate(0,0)")
 	// 	.call(yAxis);
 
-	var xAxis = create_xAxis()
-	    .innerTickSize(6)
-	    .outerTickSize(0);
+	var xAxis;
+	if (manualTicks.length > 0) {
+	    xAxis = create_xAxis()
+		.innerTickSize(6)
+		.outerTickSize(0)
+		.tickValues(manualTicks);
+	}
+	else {
+	    xAxis = create_xAxis()
+		.innerTickSize(6)
+		.outerTickSize(0);
+	}
 
 	axes.append("g")
 	    .attr("class", "x axis ")
@@ -161,7 +247,8 @@ hedotools.barchart = function() {
 	// 	.attr("transform", "rotate(-90.0," + (figwidth-width)/4 + "," + (figheight/2+30) + ")");
 
 	var xlabel = canvas.append("text")
-	    .text("Happiness")
+	    // .text("Happiness")
+	    .text(xlabeltext)
 	    .attr("class","axes-text")
 	    .attr("x",width/2+(figwidth-width)/2)
 	    .attr("y",3*(figheight-height)/4+height)
@@ -173,15 +260,15 @@ hedotools.barchart = function() {
 	    .data(sortedStates)
 	    .enter()
 	    .append("rect")
-	// .attr("fill", function(d,i) { if (data[3]>0) {return color(data[3]);} else {return color(d[3]); } })
 	    .attr("class", function(d,i) { return d[2]+" staterect"+" q"+classColor(i+1)+"-8"; })
 	    .attr("x", function(d,i) { if (d[3]>0) { return figcenter; } else { return x(d[3]); } })
 	    .attr("y", function(d,i) { return y(i+1); })
 	    .style({'opacity':'1.0','stroke-width':'1.0','stroke':'rgb(100,100,100)'})
 	    .attr("height",function(d,i) { return 11; } )
-	    .attr("width",function(d,i) { if (d[3]>0) {return x(d[3])-figcenter;} else {return figcenter-x(d[3]); } } )
-	    .on('mouseover', function(d){
+	    .attr("width",function(d,i) { if (d[3]>0) {return d3.max([x(d[3])-figcenter,0]);} else {return d3.max([figcenter-x(d[3]),0]); } } )
+	    .on('mouseover', function(d,i){
 		var rectSelection = d3.select(this).style({'opacity':'1.0','stroke':'black','stroke-width':'1.0',});
+		hedotools.barchartoncall.test(d,i);
 	    })
 	    .on('mouseout', function(d){
 		var rectSelection = d3.select(this).style({'opacity':'1.0','stroke':'rgb(100,100,100)','stroke-width':'1.0',});
@@ -196,7 +283,10 @@ hedotools.barchart = function() {
 	    .attr("x", function(d,i) { if (d[3]>0) { return figcenter-6; } else { return figcenter+6; } })
 	    .style("text-anchor", function(d,i) { if (d[3]>0) { return "end";} else { return "start";}})
 	    .attr("y",function(d,i) { return y(i+1)+11; } )
-            .text(function(d,i) { return (i+1)+". "+d[2]; });
+            .text(function(d,i) { return (i+1)+". "+d[2]; })
+	    .on('mouseover', function(d,i){
+		hedotools.barchartoncall.test(d,i);
+	    });
 
 	// d3.select(window).on("resize.shiftplot",resizeshift);
 	
@@ -237,6 +327,12 @@ hedotools.barchart = function() {
 
     var opublic = { setfigure: setfigure,
 		    setdata: setdata,
+		    _data: _data,
+		    _manualTicks: _manualTicks,
+		    _datanames: _datanames,
+		    _figheight: _figheight, 
+		    _xlabeltext: _xlabeltext, 
+		    getSorted: getSorted, 
 		    plot: plot, };
 
     return opublic;

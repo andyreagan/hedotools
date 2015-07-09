@@ -4,7 +4,7 @@
 // full flexibility
 hedotools.lensoncall = function() { 
     var test = function(extent1) {
-	console.log("set on load");
+	console.log("set on load (works for maps.html)");
 	// reset
 	for (var j=0; j<allData.length; j++) {
 	    for (var i=0; i<allData[j].rawFreq.length; i++) {
@@ -31,8 +31,9 @@ hedotools.lensoncall = function() {
 	hedotools.computeHapps.go();
 	hedotools.map.setfigure(d3.select('#map01')).setdata(geoJson).plot();
 	if (shiftRef !== shiftComp) {
-	    var shiftObj = hedotools.shifter.shift(allData[shiftRef].freq,allData[shiftComp].freq,lens,words);
-	    shiftObj.setfigure(d3.select('#shift01')).plot();
+	    hedotools.shifter.shift(allData[shiftRef].freq,allData[shiftComp].freq,lens,words);
+	    var happysad = hedotools.shifter._compH() > hedotools.shifter._refH() ? "happier" : "less happy";
+	    hedotools.shifter.setfigure(d3.select('#shift01')).setText(["Why "+allData[shiftComp].name+" is "+happysad+" than "+allData[shiftRef].name+":"]).plot();
 	}
     }
     var opublic = { test: test, };
@@ -87,19 +88,20 @@ hedotools.lens = function() {
 	    var canvas = figure.append("svg")
 		.attr("width",figwidth)
 		.attr("height",figheight)
+		.attr("id","lenssvg")
 		.attr("class","canvas");
 
 
 	    // create the x and y axis
 	    var x = d3.scale.linear()
-	    //.domain([d3.min(lens),d3.max(lens)])
-		.domain([1.00,9.00])
+	        .domain([1.00,9.00])
+		// .domain(d3.extent(lens))
 		.range([0,width]);
 	    
 	    // use d3.layout http://bl.ocks.org/mbostock/3048450
 	    var data = d3.layout.histogram()
 		.bins(x.ticks(65))
-            (lens);
+                (lens);
 
 	    // linear scale function
 	    var y =  d3.scale.linear()
@@ -182,14 +184,14 @@ hedotools.lens = function() {
 		.attr("fill", "#000000")
 		.attr("transform", "rotate(-90.0," + (figwidth-width)/4 + "," + (figheight/2+30) + ")");
 
-	    var xlabel = canvas.append("text")
-		.text("Word score")
-		.attr("class","axes-text")
-		.attr("x",width/2+(figwidth-width)/2)
-		.attr("y",figheight)
-		.attr("font-size", "12.0px")
-		.attr("fill", "#000000")
-		.attr("style", "text-anchor: middle;");
+	    // var xlabel = canvas.append("text")
+	    // 	.text("Word score")
+	    // 	.attr("class","axes-text")
+	    // 	.attr("x",width/2+(figwidth-width)/2)
+	    // 	.attr("y",figheight)
+	    // 	.attr("font-size", "12.0px")
+	    // 	.attr("fill", "#000000")
+	    // 	.attr("style", "text-anchor: middle;");
 
 	    var lensMean = d3.mean(lens);
 
@@ -223,6 +225,7 @@ hedotools.lens = function() {
 
 	    var brushX = d3.scale.linear()
 		.domain([1,9])
+		// .domain(d3.extent(lens))
 		.range([figwidth*.125,width+figwidth*.125]);
 	    
 
@@ -241,7 +244,7 @@ hedotools.lens = function() {
 
 		    lensExtent = [Math.round(extent1[0]*4)/4,Math.round(extent1[1]*4)/4];
 		    hedotools.lensoncall.test(extent1);
-		}
+		} 
 
 		d3.select(this).transition()
 		    .call(brush.extent(lensExtent))
