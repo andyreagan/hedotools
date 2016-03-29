@@ -19,7 +19,7 @@
 // can also use the setText method to set the text
 
 // define the shifter module 
-hedotools.shifter = function() 
+hedotools.shifter = function()
 {
     // for the word type selection
     var shiftselencoder = d3.urllib.encoder().varname("wordtypes");
@@ -27,6 +27,10 @@ hedotools.shifter = function()
     // initialize that we have't selected a shift
     var shiftTypeSelect = false;
     var shiftType = -1;
+
+    // put the status of the viz into the bar
+    var viz_type = d3.urllib.encoder().varname("viz");
+    var viz_type_decoder = d3.urllib.decoder().varname("viz").varresult("wordshift");
 
     // set a special variable to make sure all necessary things
     // have been set before shifting
@@ -172,6 +176,7 @@ hedotools.shifter = function()
     var sortedMag;
     var sortedType;
     var sortedWords;
+    var sortedWordsRaw;
     var sortedWordsEn;
     var sumTypes;
     var refH;
@@ -204,6 +209,7 @@ hedotools.shifter = function()
     var _sortedWords = function(_) {
 	if (!arguments.length) return sortedWords;
 	sortedWords = _;
+        sortedWordsRaw = _;
 	return hedotools.shifter;
     }
     var _sortedWordsEn = function(_) {
@@ -253,6 +259,7 @@ hedotools.shifter = function()
 	sortedMag = a;
 	sortedType = b;
 	sortedWords = c;
+        sortedWordsRaw = c;
 	sumTypes = d;
 	refH = e;
 	compH = f;
@@ -1100,6 +1107,7 @@ hedotools.shifter = function()
 	// console.log("appending to sorted words");
 	// console.log(sortedWords);
 
+        sortedWordsRaw = sortedWords;
 	concatter();
 
 	maxWidth = d3.max(sortedWords.slice(0,5).map(function(d) { return d.width(wordfontsize + "px Latex default"); }));
@@ -1162,7 +1170,7 @@ hedotools.shifter = function()
 	    .attr("width", figwidth-2)
 	    .attr("height", figheight-2)
 	    .attr("class", "bg")
-	    .style({"stroke-width":"2","stroke":"rgb(0,0,0)"})
+	    .style({"stroke-width":"0.5","stroke":"rgb(0,0,0)"})
 	    .attr("fill", "#FCFCFC")
 	    .attr("opacity","0.96");
 
@@ -1253,7 +1261,7 @@ hedotools.shifter = function()
 	    .attr("class", function(d,i) { return "shifttext "+intStr0[sortedType[i]]; })
 	    .attr("x",function(d,i) { if (d>0) {return x(d)+2;} else {return x(d)-2; } } )
 	    .attr("y",function(d,i) { return y(i+1)+iBarH; } )
-	    .style({"text-anchor": function(d,i) { if (sortedMag[i] < 0) { return "end";} else { return "start";}}, "font-size": bigshifttextsize})
+	    .style({"text-anchor": function(d,i) { if (sortedMag[i] < 0) { return "end";} else { return "start";}}, "font-size": wordfontsize})
 	    .text(function(d,i) { return sortedWords[i]; });
 
 	if (translate) {
@@ -1689,9 +1697,9 @@ hedotools.shifter = function()
 	    .attr("class","axes-text")
 	    .attr("x",axeslabelmargin.left+figcenter) // 350-20-10 for svg width,  
 	    .attr("y",boxheight-7)
-	    .attr("font-size", xylabelfontsize)
-	    .attr("fill", "#000000")
-	    .attr("style", "text-anchor: middle;");
+	    .style({"font-size": xylabelfontsize,
+                    "fill": "#000000",
+                    "text-anchor": "middle"});
 
 	ylabel = canvas.append("text")
 	    .text(ylabel_text)
@@ -1846,7 +1854,8 @@ hedotools.shifter = function()
 		.attr({
 		    "x": distgroupw+2,
 		    "y": distgrouph+2,
-		    "class": "nwordslabel",
+		    "class": "nwordslabel",})
+                .style({
 		    "fill": "#B8B8B8",
 		    "font-size": distlabeltext,
 		    "text-anchor": "start",
@@ -1857,7 +1866,8 @@ hedotools.shifter = function()
 		.attr({
 		    "x": distgroupw+2,
 		    "y": 2,
-		    "class": "zerolabel",
+		    "class": "zerolabel",})
+                .style({
 		    "fill": "#B8B8B8",
 		    "font-size": distlabeltext,
 		    "text-anchor": "start",
@@ -1871,11 +1881,13 @@ hedotools.shifter = function()
 	    .enter()
 	    .append("text")
             .attr({"class": "credit",
-		   "fill": "#B8B8B8",
 		   "x": (figwidth-5),
 		   "y": function(d,i) { return figheight-15+i*10; },
-		   "font-size": creditfontsize, })
-            .style({"text-anchor": "end", })
+		   })
+            .style({"text-anchor": "end",
+                    "fill": "#B8B8B8",
+                    "font-size": creditfontsize,
+                   })
 	    .text(function(d) { return d; });
 
 	// get this inside of the plot...so that resizeshift won't get called
@@ -2012,9 +2024,443 @@ hedotools.shifter = function()
 	    }); // on("click")
     }; // translateButton
 
+    // use the layout implementation of jason davies
+    var cloud2 = function() {
+        // reselect...
+        var bars = axes.selectAll("rect.shiftrect").transition().duration(1000).attr("x",1000);
+        var sizeScale = d3.scale.linear()
+            .domain([Math.abs(sortedMag[49]),Math.abs(sortedMag[0])])
+            .range([10,70]);
+        
+        var data = sortedWordsRaw.map(function(d, i) {
+            a = {};
+            a.text = d;
+            // a.font = "Impact";
+            // a.style = "serif";
+            // a.weight = "normal";
+            // a.rotate = (~~(Math.random() * 6)) * 10;
+            a.size = sizeScale(Math.abs(sortedMag[i]));
+            // a.padding = 1;
+            return a;
+        });
+
+        console.log([figwidth,figheight]);
+
+        var layout = d3.layout.cloud()
+            .size([figwidth/2,figheight/2])
+            .words(data)
+            .padding(1)
+            .rotate(function() { return (Math.random() - .5)* 30; })
+            .font("Impact")
+            .fontSize(function(d) { return d.size; })
+            .on("end", draw);
+
+        layout.start();        
+
+        function draw(words) {
+            axes.selectAll("text.shifttext").data(words)
+                .text(function(d,i) { return d.text; })
+                .transition().duration(1000)
+                .delay(function(d,i) { return i*10; })
+                .attr("x", function(d,i) { return figwidth/2; })
+                .attr("y", function(d,i) { return figheight/2; })
+                .style("text-anchor", "middle")
+                // .style("font-variant", "none")
+                // .style("font-style", function(d) { return d.style; })
+                .style("font-weight", function(d) { return d.weight; })
+                .style("font-size", function(d) { return d.size + "px"; })
+                .style("font-family", function(d) { return d.font + ", " + d.style; })
+                // .style("font-family", function(d) { return d.font; })
+                // .style("font", function(d,i) { return d.size + "px " + d.font + ", " + d.style; })
+                .attr("transform", function(d,i) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                });
+        }
+
+        axes.selectAll(".sumrectR").transition().duration(2000).attr("x",1000);
+	axes.selectAll(".sumtextR").transition().duration(2000).attr("x",1000);
+	axes.selectAll(".sumrectL").transition().duration(2000).attr("x",-1000);
+	axes.selectAll(".sumtextL").transition().duration(2000).attr("x",-1000);
+        // bgrect.style("stroke-width",0.5);
+        bottombgrect.attr("y",1000);
+        // // need to get rid of the clipping boundary too?
+        // bgrect.remove();
+        
+        xlabel.transition().duration(2000).attr("y",1000);
+        ylabel.transition().duration(2000).attr("x",-1000);
+	topbgrect.transition().duration(2000).attr("y",-200);
+        sepline.transition().duration(1000).attr({"y1":-10,"y2":-10,});
+        
+        return hedotools.shifter;
+    } // hedotools.shifter.cloud2
+
+    var cloud = function() {
+        viz_type.varval("cloud");
+        
+        var newbars = axes.selectAll("rect.shiftrect").transition().duration(1000).attr("x",1000);
+
+        axes.selectAll(".sumrectR").transition().duration(2000).attr("x",1000);
+	axes.selectAll(".sumtextR").transition().duration(2000).attr("x",1000);
+	axes.selectAll(".sumrectL").transition().duration(2000).attr("x",-1000);
+	axes.selectAll(".sumtextL").transition().duration(2000).attr("x",-1000);
+        // bgrect.style("stroke-width",0.5);
+        bottombgrect.attr("y",1000);
+        // // need to get rid of the clipping boundary too?
+        // bgrect.remove();
+        
+        xlabel.transition().duration(2000).attr("y",1000);
+        ylabel.transition().duration(2000).attr("x",-1000);
+	topbgrect.transition().duration(2000).attr("y",-200);
+        sepline.transition().duration(1000).attr({"y1":-10,"y2":-10,});
+
+        var sizeScale = d3.scale.linear()
+            .domain([Math.abs(sortedMag[49]),Math.abs(sortedMag[0])])
+            .range([10,70]);
+
+        // go create a canvas and get the context there
+        // var cloud_canvas = document.createElement("canvas");
+        // cloud_canvas.width = figwidth;
+        // cloud_canvas.height = figheight;
+        // // cloud_canvas.width = 2048;
+        // // cloud_canvas.height = 2048;
+        d3.select("#figure01").append("canvas")
+            .attr({"width": figwidth, "height": figheight, "id": "cloudcanvas"});
+        // var cloud_canvas_context = cloud_canvas.getContext("2d");
+        var cloud_canvas_context = document.getElementById("cloudcanvas").getContext("2d");
+
+        d3.select("#figure01").append("canvas")
+            .attr({"width": figwidth, "height": figheight, "id": "cloudcanvas2"});
+        // var cloud_canvas_context = cloud_canvas.getContext("2d");
+        var cloud_canvas_context_demo = document.getElementById("cloudcanvas2").getContext("2d");        
+
+        cloud_canvas_context.textAlign = "center";
+        // cloud_canvas_context.textBaseline = "bottom";
+        cloud_canvas_context.fillStyle = "red";
+        cloud_canvas_context.strokeStyle = "red";
+        cloud_canvas_context.textAlign = "center";
+        cloud_canvas_context.save();
+        
+        // keep track of everything in this data structure
+        var data = sortedWordsRaw.map(function(d, i) {
+            a = {};
+            // text
+            a.text = d;
+            // random rotation
+            a.rotate = (~~(Math.random() * 6) - 3) * 5;
+            // a.rotate = 0;
+            // scale the size (see scale above)
+            a.size = sizeScale(Math.abs(sortedMag[i]));
+            // set the font style using a single string
+            // https://developer.mozilla.org/en-US/docs/Web/CSS/font
+            a.fontString = a.size+"px \"cmr10\", serif";
+            // don't let them touch
+            a.padding = 2;
+            // initially space them along the horizontal line
+            // width half of the width
+            a.x = figcenter+(Math.random()-.5)*figwidth/2;
+            a.y = figheight/2;
+            return a;
+        });
+
+        var num_to_cloud = 199;
+
+        var size = [figwidth,figheight];
+        var bounds = null;
+        var board = [];
+        var i = -1;
+        while (i++ < num_to_cloud ) {
+            var d = data[i];
+            // go and generate the image data
+            // it saves on d
+            
+            cloudSpriteSimple(cloud_canvas_context_demo, d, size);
+
+            // this will place it (updating x and y)
+            var success = place(board,d);
+            // reset the bounds
+            // if (bounds) cloudBounds(bounds, d);
+            // else bounds = [{x: d.x + d.x0, y: d.y + d.y0}, {x: d.x + d.x1, y: d.y + d.y1}];
+            // translate such that the rotation actually is centered
+            // put it back to having all of the words
+            cloud_canvas_context.setTransform(1, 0, 0, 1, 0, 0);
+            cloud_canvas_context.save();
+            cloud_canvas_context.font = d.fontString;
+            cloud_canvas_context.lineWidth = 2 * d.padding;
+            cloud_canvas_context.translate(d.x, d.y);
+            cloud_canvas_context.rotate(d.rotate * cloudRadians);
+            // put it in the center (with the translation)
+            cloud_canvas_context.fillText(d.text, 0, 0);
+            cloud_canvas_context.strokeText(d.text, 0, 0);
+            cloud_canvas_context.restore();
+            // console.log(d);
+        }
+
+        // num_to_cloud += 30;
+	var newwords = axes.selectAll("text.shifttext").data(data)
+            .filter(function(d, i) { if (i < num_to_cloud+1) { return 1; } });
+
+        newwords.text(function(d,i) { return d.text; })
+            .transition().duration(1000)
+            // .delay(function(d,i) { return i*50; })
+            // .style("font-size", function(d,i) { return sizeScale(Math.abs(sortedMag[i])); })
+            // .attr("x",function(d,i) { return Math.random()*100+figcenter; })
+            // .attr("y",function(d,i) { return Math.random()*100+figheight/2; });
+            .attr("placed",function(d,i) { return d.placed; } )
+            // .attr("x", function(d,i) { return d.x; })
+        // .attr("y", function(d,i) { return d.y; })
+            .attr("x", function(d,i) { return 0; })
+            .attr("y", function(d,i) { return 0; })
+            .style("text-anchor", "middle")
+            // .style("font-size", function(d) { return d.size + "px"; })
+            // .style("font-family", "\"Impact\", serif")
+        // .style("font", function(d,i) { return d.size + "px " + d.font + ", " + d.style; })
+            .style("font", function(d,i) { return d.fontString; })
+            .attr("transform", function(d,i) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                // return "rotate(" + d.rotate + ")";
+            });
+        
+        function place(board, tag) {
+            // size of the whole figure
+            var perimeter = [{x: 0, y: 0}, {x: size[0], y: size[1]}];
+            // initial position
+            var startX = tag.x;
+            var startY = tag.y;
+            // diagonal length of the board
+            var maxDelta = Math.sqrt(size[0] * size[0] + size[1] * size[1]);
+            // spiral outward!
+            var e = size[0] / size[1];
+            var archimedeanSpiral = function(t) {
+                return [e * t * Math.cos(t), t * Math.sin(t)];
+            };
+            // randomly choose a direction to spin
+            var dt = Math.random() < .5 ? 1 : -1;
+            // start on the other side of 0, with a small timestep
+            var delta = 1;
+            dt = dt*delta;
+            var t = -dt;
+            var dxdy;
+            var dx;
+            var dy;
+            
+            // march ahead, setting dxdy as the position of our spiral
+            while ( dxdy = archimedeanSpiral(t += dt) ) {
+                dx = dxdy[0];
+                dy = dxdy[1];
+
+                // make sure we are not outside the radius
+                // if so, kill it
+                if (Math.min(Math.abs(dx), Math.abs(dy)) >= maxDelta) break;
+
+                // update the position
+                tag.x = startX + dx;
+                tag.y = startY + dy;
+
+                // console.log(dxdy);
+                // axes.selectAll("circle").remove();
+                // axes.append("circle")
+                //     .attr({"cx": tag.x, "cy": tag.y, "r": 1})
+                //     .style({"fill": "red",});
+
+
+                // if the word extends past the edge, keep rotating
+                // (it should come back in!)
+                if (tag.x + tag.x0 < 0 || tag.y + tag.y0 < 0 ||
+                    tag.x + tag.x1 > size[0] || tag.y + tag.y1 > size[1]) continue;
+
+                // now let's take the image data from the canvas, and compare the placement
+                // of the data from the tag's sprite
+                // not using the board, (which could store the bounding boxes for a smarter search)
+                
+                // for the whole canvas
+                // var cloud_canvas_monochrome = monochrome(cloud_canvas_context.getImageData(0, 0, size[0], size[1]).data);
+                // for the just the bounding box of the sprite
+                // could fetch this from the above....
+                // console.log(cloud_canvas_context.getImageData(tag.x+tag.x0, tag.y-tag.y1, 2*tag.x1, tag.y1));
+                var cloud_canvas_monochrome = monochrome(cloud_canvas_context.getImageData(Math.floor(tag.x)+tag.x0, Math.floor(tag.y)-tag.y1, 2*tag.x1, tag.y1).data);
+                // // console.log(cloud_canvas_monochrome);
+                // console.log(cloud_canvas_monochrome.reduce(function(pv, cv) { return pv + cv; }, 0))
+                // // console.log(tag.sprite);
+                // console.log(tag.sprite.reduce(function(pv, cv) { return pv + cv; }, 0));
+                for (var i=0; i<tag.sprite.length; i++) {
+                    // check that they both have data there
+                    if (tag.sprite[i] && cloud_canvas_monochrome[i] ) {
+                        break
+                    }
+                }
+                // index on the canvas data is tag.x
+                if (i === tag.sprite.length) {
+                    // console.log(t);
+                    return true;
+                }
+            }// while()
+            // console.log(t);
+            return false;
+        } // place()
+        return hedotools.shifter;
+    } // hedotools.shifter.cloud
+
+    var newrank;
+    var newfreq;
+    var newtype;
+    var newmag;
+    var header;
+
+    var table = function() {
+        viz_type.varval("table");
+        var rankwidth = 20;
+        var wordwidth = 70;
+        var typewidth = 25;
+        var freqwidth = 25;
+        var magwidth = 35;
+        var totalwidth = rankwidth+wordwidth+typewidth+freqwidth+magwidth;
+        console.log("width of all the text stuff "+totalwidth);
+        var barswidth = figwidth-totalwidth;
+        var aligns = ["start","start","middle","middle","end","middle"];
+        console.log("width left "+barswidth);
+        xpadding = 10;
+        var barcenter = totalwidth+barswidth/2;
+        var width_offsets = [0,rankwidth,rankwidth+wordwidth,rankwidth+wordwidth+typewidth,rankwidth+wordwidth+typewidth+freqwidth+magwidth,barcenter];
+        
+	// linear scale function
+	x.domain([-Math.abs(sortedMag[0]),Math.abs(sortedMag[0])])
+	    .range([xpadding,barswidth-xpadding]);
+
+        yHeight = 15;
+
+	// linear scale function
+	y.range([figheight+2, yHeight]); 
+
+	// both of these need their y height reset
+	resetButton(false);
+
+	// if (translate) {
+	//     translateButton();
+	// }
+
+	var newbars = axes.selectAll("rect.shiftrect").data(sortedMag);
+	var newwords = axes.selectAll("text.shifttext").data(sortedMag);
+
+	newbars.transition().duration(1000)
+	    // .attr("fill", function(d,i) { if (sortedType[i] == 2) {return "#4C4CFF";} else if (sortedType[i] == 3) {return "#FFFF4C";} else if (sortedType[i] == 0) {return "#B3B3FF";} else { return "#FFFFB3"; }})
+            .attr("fill", "grey")
+	    .attr("class", function(d,i) { return "shiftrect "+intStr0[sortedType[i]]; })
+            .attr("y", function(d,i) { return y(i+1)+2.5; })
+	    .attr("x",function(d,i) { 
+		    if (d>0) { return barcenter; } 
+		    else { return x(d)+totalwidth} })
+	    .attr("height",function(d,i) { return iBarH; } )
+	    .attr("width",function(d,i) { if ((d)>0) {return x(d)-x(0);} else {return x(0)-x(d); } } )
+
+	newwords.transition().duration(1000)
+	    .attr("class", function(d,i) { return "shifttext "+intStr0[sortedType[i]]; })
+	    .style({"text-anchor": "start", "font-size": wordfontsize})
+            .attr("y",function(d,i) { return y(i+1)+iBarH; } )
+	    .attr("x",function(d,i) { return rankwidth; } )
+            .text(function(d,i) { return sortedWordsRaw[i]; });
+
+        newrank = axes.selectAll("text.shiftrank").data(sortedMag)
+            .enter()
+            .append("text")
+            .attr("y",function(d,i) { return y(i+1)+iBarH; } )
+	    .attr("x",function(d,i) { return 0; } )
+            .style({"text-anchor": "start", "font-size": wordfontsize})
+            .text(function(d,i) { return (i+1)+"."; });
+
+        newtype = axes.selectAll("text.shifttype").data(sortedMag)
+            .enter()
+            .append("text")
+            .attr("y",function(d,i) { return y(i+1)+iBarH; } )
+	    .attr("x",function(d,i) { return rankwidth+wordwidth; } )
+            .style({"text-anchor": "middle", "font-size": wordfontsize})
+            .text(function(d,i) { 
+	        if (sortedType[i] == 0) { return "\u002D"; } 
+		else if (sortedType[i] == 2) { return "\u002D"; } // -
+	        else { return "\u002B"; } // +
+            });
+                    
+        newfreq = axes.selectAll("text.shiftfreq").data(sortedMag)
+            .enter()
+            .append("text")
+            .attr("y",function(d,i) { return y(i+1)+iBarH; } )
+	    .attr("x",function(d,i) { return rankwidth+wordwidth+typewidth; } )
+            .style({"text-anchor": "middle", "font-size": wordfontsize})
+            .text(function(d,i) { 
+	        if (sortedType[i] == 0) { return "\u2193"; } 
+		else if (sortedType[i] == 1) { return "\u2193"; }
+		else { return "\u2191"; }
+            });
+
+        newmag = axes.selectAll("text.shiftmag").data(sortedMag)
+            .enter()
+            .append("text")
+            .attr("y",function(d,i) { return y(i+1)+iBarH; } )
+	    .attr("x",function(d,i) { return rankwidth+wordwidth+typewidth+freqwidth+magwidth; } )
+            .style({"text-anchor": "end", "font-size": wordfontsize})
+            .text(function(d,i) { return (d/(Math.abs(compH-refH))*100).toFixed(2)+"%"; });
+
+        header = axes.selectAll("text.header")
+            .data(["#","Word","\u002B/\u002D","\u2191/\u2193","% Cont.","% Cont."])
+            .enter()
+            .append("text")
+            .attr({"x": function(d,i) { return width_offsets[i]; },
+                   "y": function(d,i) { return y(0)+iBarH; }, })
+            .style({"text-anchor": function(d,i) { return aligns[i]; },
+                    "font-size": function(d,i) { return wordfontsize; }, })
+            .text(function(d,i) { return d; })
+        
+	axes.selectAll(".sumrectR").transition().duration(2000).attr("x",1000);
+	axes.selectAll(".sumtextR").transition().duration(2000).attr("x",1000);
+	axes.selectAll(".sumrectL").transition().duration(2000).attr("x",-1000);
+	axes.selectAll(".sumtextL").transition().duration(2000).attr("x",-1000);
+        bgrect.style("stroke-width",0);
+        bottombgrect.attr("y",1000);
+        // // need to get rid of the clipping boundary too?
+        // bgrect.remove();
+        xlabel.transition().duration(2000).attr("y",1000);
+        ylabel.transition().duration(2000).attr("x",-1000);
+	topbgrect.transition().duration(2000).attr("y",-200);
+        sepline.transition().duration(1000).attr({"y1":"15","y2":15,});
+
+        function zoomed() {
+	    // console.log(d3.event);
+	    if (d3.event.translate[1] > 0) {
+		zoom.translate([0,0]).scale(1);
+	    }
+	    
+	    newbars.attr("y", function(d,i) { return y(i+1) });
+	    newwords.attr("y", function(d,i) { return y(i+1)+iBarH; } );
+            newrank.attr("y", function(d,i) { return y(i+1)+iBarH; } );
+            newtype.attr("y", function(d,i) { return y(i+1)+iBarH; } );
+            newfreq.attr("y", function(d,i) { return y(i+1)+iBarH; } );
+            newmag.attr("y", function(d,i) { return y(i+1)+iBarH; } );
+
+	}; // zoomed
+
+        zoom = d3.behavior.zoom()
+	    .y(y) // pass linear scale function
+	    // .translate([10,10])
+	    .scaleExtent([1,1])
+	    .on("zoom",zoomed);
+        
+	return hedotools.shifter;
+    } // hedotools.shifter.table()
+
     var replot = function() {
 	// apply new data to the bars, transition everything
 	// tricky to get the transition right
+        
+        var yHeight = (7+17*3+14+5-13); // 101
+
+        // linear scale function
+	y.range([figheight+2, yHeight]);
+        sepline.transition().duration(1000).attr({"y1":barHeight,"y2":barHeight,});
+
+        newrank.remove();
+        newfreq.remove();
+        newtype.remove();
+        newmag.remove();
+        header.remove();
 
 	// make sure to update this
 	if (comparisonText[0].length < 1) {
@@ -2036,6 +2482,7 @@ hedotools.shifter = function()
 	    // console.log(comparisonText);
 	}
 
+        sortedWords = sortedWordsRaw;
 	concatter();
 
 	// could set a cap to make sure no 0"s
@@ -2066,11 +2513,8 @@ hedotools.shifter = function()
 	axes.attr("transform","translate("+(axeslabelmargin.left)+","+(axeslabelmargin.top+toptextheight)+")")
 	    .attr("height", figheight);
 	
-	bgrect.attr("height", figheight-2);
-
-	ylabel.attr("y",figheight/2+60+toptextheight)
-	    .attr("transform", "rotate(-90.0," + (18) + "," + (figheight/2+60+toptextheight) + ")");
-
+	bgrect.attr("height", figheight-2).style({"stroke-width":0.5,"stroke": "rgb(20,20,20)"});
+        
 	topbgrect2.attr("height",toptextheight);
 
 	// // console.log(figheight);
@@ -2153,24 +2597,24 @@ hedotools.shifter = function()
 
 	var newbars = axes.selectAll("rect.shiftrect").data(sortedMag);
 	var newwords = axes.selectAll("text.shifttext").data(sortedMag);
-
-
 	
 	// if we haven't dont a subselection, apply with a transition
 	if (shiftseldecoder().current === "none" || shiftseldecoder().current.length === 0) {
-	    newbars.transition()
+	    newbars.transition().duration(1500)
 		.attr("fill", function(d,i) { if (sortedType[i] == 2) {return "#4C4CFF";} else if (sortedType[i] == 3) {return "#FFFF4C";} else if (sortedType[i] == 0) {return "#B3B3FF";} else { return "#FFFFB3"; }})
 		.attr("class", function(d,i) { return "shiftrect "+intStr0[sortedType[i]]; })
 		.attr("x",function(d,i) { 
 		    if (d>0) { return figcenter; } 
 		    else { return x(d)} })
+            	.attr("y",function(d,i) { return y(i+1); })
 		.attr("height",function(d,i) { return iBarH; } )
 		.attr("width",function(d,i) { if ((d)>0) {return x(d)-x(0);} else {return x(0)-x(d); } } )
 
-	    newwords.transition()
+	    newwords.transition().duration(1500)
 		.attr("class", function(d,i) { return "shifttext "+intStr0[sortedType[i]]; })
 		.style({"text-anchor": function(d,i) { if (sortedMag[i] < 0) { return "end";} else { return "start";}}, "font-size": wordfontsize})
 		.text(function(d,i) { return sortedWords[i]; })
+                .attr("y",function(d,i) { return y(i+1)+iBarH; })
 		.attr("x",function(d,i) { if (d>0) {return x(d)+2;} else {return x(d)-2; } } );
 	}
 	// else apply without a transition
@@ -2243,7 +2687,7 @@ hedotools.shifter = function()
 	var newRtopbars = axes.selectAll(".sumrectR")
 	    .data(summaryArray);
 	
-	newRtopbars.transition()
+	newRtopbars.transition().duration(1500)
 	    .attr("x",function(d,i) { 
 		if (d>0) { 
 		    return figcenter;
@@ -2254,7 +2698,7 @@ hedotools.shifter = function()
 	var newRtoptext = axes.selectAll(".sumtextR")
 	    .data([sumTypes[3],sumTypes[0],d3.sum(sumTypes)]);
 
-	newRtoptext.transition().attr("class", "sumtextR")
+	newRtoptext.transition().duration(1500).attr("class", "sumtextR")
 	    .style("text-anchor",function(d,i) { if (d>0) {return "start";} else {return "end";} })
 	    .attr("x",function(d,i) { return topScale(d)+5*d/Math.abs(d); });
 	
@@ -2263,7 +2707,7 @@ hedotools.shifter = function()
 	var newLtopbars = axes.selectAll(".sumrectL")
 	    .data(summaryArray);
 
-	newLtopbars.transition().attr("fill", function(d,i) { 
+	newLtopbars.transition().duration(1500).attr("fill", function(d,i) { 
 	    if (i==0) {
 		return "#FFFFB3";
 	    } 
@@ -2307,7 +2751,7 @@ hedotools.shifter = function()
 	var newLtoptext = axes.selectAll(".sumtextL")
 	    .data([sumTypes[1],sumTypes[2]]);
 
-	newLtoptext.transition().attr("x",function(d,i) { return topScale(d)-5; });
+	newLtoptext.transition().duration(1500).attr("x",function(d,i) { return topScale(d)-5; });
 
 	return hedotools.shifter;
 	
@@ -2341,7 +2785,11 @@ hedotools.shifter = function()
 	// canvas.select(".x.axis").call(xAxis);
 
 	// get the x label
-	xlabel.attr("x",(leftOffsetStatic+figwidth/2));
+	xlabel.transition().duration(2000).attr("x",(leftOffsetStatic+figwidth/2))
+	    .attr("y",boxheight-7);
+        ylabel.transition().duration(2000).attr("y",figheight/2+60+toptextheight)
+            .attr("x",18)
+	    .attr("transform", "rotate(-90.0," + (18) + "," + (figheight/2+60+toptextheight) + ")");
 
 	// the andy reagan credit
 	// credit.attr("x",width-7);
@@ -2410,7 +2858,10 @@ hedotools.shifter = function()
 		    setdata: setdata,
 		    plot: plot,
 		    show_x_axis: show_x_axis,
-		    replot: replot, 
+		    replot: replot,
+                    table: table,
+                    cloud: cloud,
+                    cloud2: cloud2, 
 		    setText: setText,
 		    setWidth: setWidth,
 		    setHeight: setHeight,
@@ -2446,9 +2897,102 @@ hedotools.shifter = function()
     return opublic;
 }();
 
+function cloudSpriteSimple(my_canvas_context, d, size) {
+    if (d.sprite) return;
+    
+    my_canvas_context.setTransform(1, 0, 0, 1, 0, 0);
+    my_canvas_context.clearRect(0, 0, size[0],size[1]);
+    my_canvas_context.save()
 
+    // set the initial values
+    var x = 0;
+    var y = 0;
+    var maxh = 0;
+    
+    my_canvas_context.font = d.fontString;
+    my_canvas_context.textAlign = "center";
+    my_canvas_context.textBaseline = "bottom";
+    my_canvas_context.fillStyle = "red";
+    my_canvas_context.strokeStyle = "red";
+    my_canvas_context.textAlign = "center";
+    my_canvas_context.lineWidth = 2 * d.padding;
 
+    var w = my_canvas_context.measureText(d.text + "m").width,
+        h = d.size;
 
+    d.x0 = Math.floor(-w/2);
+    d.x1 = Math.ceil(w/2);
+    d.y0 = 0;
+    d.y1 = Math.ceil(h);
 
+    // translate such that the rotation actually works
+    my_canvas_context.translate(size[0]/2, size[1]/2);
+    
+    my_canvas_context.rotate(d.rotate * cloudRadians);
+    // put it in the center (with the translation)
+    my_canvas_context.fillText(d.text, 0, 0);
 
+    // test that we contain the text here
+    // my_canvas_context.strokeRect(d.x0, d.y0-d.y1, w, h);
+    
+    my_canvas_context.strokeText(d.text, 0, 0);
+    // var pixels = my_canvas_context.getImageData(0, 0, size[0], size[1]).data;
+    // my_canvas_context.setTransform(1, 0, 0, 1, 0, 0);
+    var pixels = my_canvas_context.getImageData(size[0]/2+d.x0, size[1]/2+d.y0-d.y1, 2*d.x1, d.y1).data;
+    // now let's convert this raw RGBA 0-255 data into a monochrome
+    d.sprite = monochrome(pixels);
+    my_canvas_context.restore();
+}
 
+function monochrome(pixels) {
+    var a = Array(pixels.length/4);
+    for (var i=0; i<a.length; i++) {
+        // standard luminance scale
+        // var L = (0.2126 * pixels[i*4] + 0.7152 * pixels[i*4+1] + 0.0722 * pixels[i*4+2]);
+        // I set the canvas to only show red
+        var L = pixels[i*4]
+        // don't multiply by the alpha, just make sure the luminance
+        // is more than .1 percent
+        if (L > (.1*256)) { a[i] = 1; }
+        else { a[i] = 0; }
+        // a[i] = (L/256 > 0.1) ? 1 : 0;
+    }
+    return a;
+}
+
+// Use mask-based collision detection.
+function cloudCollide(tag, board, sw) {
+    sw >>= 5;
+    var sprite = tag.sprite,
+        w = tag.width >> 5,
+        lx = tag.x - (w << 4),
+        sx = lx & 0x7f,
+        msx = 32 - sx,
+        h = tag.y1 - tag.y0,
+        x = (tag.y + tag.y0) * sw + (lx >> 5),
+        last;
+    for (var j = 0; j < h; j++) {
+        last = 0;
+        for (var i = 0; i <= w; i++) {
+            if (((last << msx) | (i < w ? (last = sprite[j * w + i]) >>> sx : 0))
+                & board[x + i]) return true;
+        }
+        x += sw;
+    }
+    return false;
+}
+
+function cloudBounds(bounds, d) {
+    var b0 = bounds[0],
+        b1 = bounds[1];
+    if (d.x + d.x0 < b0.x) b0.x = d.x + d.x0;
+    if (d.y + d.y0 < b0.y) b0.y = d.y + d.y0;
+    if (d.x + d.x1 > b1.x) b1.x = d.x + d.x1;
+    if (d.y + d.y1 > b1.y) b1.y = d.y + d.y1;
+}
+
+function collideRects(a, b) {
+    return a.x + a.x1 > b[0].x && a.x + a.x0 < b[1].x && a.y + a.y1 > b[0].y && a.y + a.y0 < b[1].y;
+}
+
+var cloudRadians = Math.PI / 180;
