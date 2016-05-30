@@ -1375,7 +1375,7 @@ hedotools.shifter = function()
             // ((d>0) ? 500 : -500)
             // ((d>0) ? figcenter : x(d))
 	    axes.selectAll("rect.shiftrect.zero").attr("transform",function(d,i) { return "translate("+((d>0) ? 500 : -500)+","+y(i+1)+")"; });
-            axes.selectAll("rect.shifttext.zero").attr("transform",function(d,i) { return "translate("+((d>0) ? 500 : -500)+","+(y(i+1)+iBarH)+")"; });
+            axes.selectAll("text.shifttext.zero").attr("transform",function(d,i) { return "translate("+((d>0) ? 500 : -500)+","+(y(i+1)+iBarH)+")"; });
 	    axes.selectAll("rect.shiftrect.one").attr("transform",function(d,i) { return "translate("+((d>0) ? 500 : -500)+","+y(i+1)+")"; });
 	    axes.selectAll("text.shifttext.one").attr("transform",function(d,i) { return "translate("+((d>0) ? 500 : -500)+","+(y(i+1)+iBarH)+")"; });
 	    axes.selectAll("rect.shiftrect.two").attr("transform",function(d,i) { return "translate("+((d>0) ? 500 : -500)+","+y(i+1)+")"; });
