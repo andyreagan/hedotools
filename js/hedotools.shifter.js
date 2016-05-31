@@ -1805,25 +1805,25 @@ hedotools.shifter = function()
 
 	function zoomed() {
 	    // console.log(d3.event);
+
+            // this prevents scrolling in the wrong direction
 	    if (d3.event.translate[1] > 0) {
 		zoom.translate([0,0]).scale(1);
 	    }
 	    
 	    // if we have zoomed in, we set the y values for each subselection
-	    // console.log(shiftTypeSelect);
 	    if (shiftTypeSelect) {
 		for (var j=0; j<4; j++) {
 		    axes.selectAll("rect.shiftrect."+intStr0[j])
                         .attr("transform",function(d,i) {
-                            if (d>0) { return "translate("+(figcenter)+","+(y(i+1))+")"; } 
-		            else { return "translate("+(x(d))+","+(y(i+1))+")"; }
+                            return "translate("+(shiftType===j ? ((d>0) ? figcenter : x(d)) : ((d>0) ? 500 : -500))+","+(y(i+1))+")";
                         });
 		    axes.selectAll("text.shifttext."+intStr0[j])
                         .attr("transform",function(d,i) {
-                            if (d>0) { return "translate("+(x(d)+2)+","+(y(i+1)+iBarH)+")"; } 
-		            else { return "translate("+(x(d)-2)+","+(y(i+1)+iBarH)+")"; } });
-		}
-	    }
+                            return "translate("+(shiftType===j ? ((d>0) ? (x(d)+2) : (x(d)-2) ) : ((d>0) ? 500 : -500))+","+(y(i+1)+iBarH)+")";
+		        });
+                }
+            }
 	    else {
 		axes.selectAll("rect.shiftrect")
                     .attr("transform",function(d,i) {
