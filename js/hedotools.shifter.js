@@ -197,22 +197,6 @@ hedotools.shifter = function()
     var refH;
     var compH;
 
-    var xlabel_text = "Per word average happiness shift";
-    var _xlabel_text = function(_) {
-        var that = this;
-	if (!arguments.length) return xlabel_text;
-	xlabel_text = _;
-	return that;
-    }
-
-    var ylabel_text = "Word Rank";
-    var _ylabel_text = function(_) {
-        var that = this;
-	if (!arguments.length) return ylabel_text;
-	ylabel_text = _;
-	return that;
-    }
-
     var _sortedMag = function(_) {
         var that = this;
 	if (!arguments.length) return sortedMag;
@@ -229,20 +213,28 @@ hedotools.shifter = function()
         var that = this;
 	if (!arguments.length) return sortedWords;
 	sortedWords = _;
-        sortedWordsRaw = _;
 	return that;
     }
-    var _sortedWordsEn = function(_) {
+    var _sortedWordsRaw = function(_) {
         var that = this;
-	if (!arguments.length) return sortedWordsEn;
-	sortedWordsEn = _;
-        sortedWordsRaw = _;
+	if (!arguments.length) return sortedWordsRaw;
+	sortedWordsRaw = _;
 	return that;
     }
-    var _sumTypes = function(_) {
+
+    var xlabel_text = "Per word average happiness shift";
+    var _xlabel_text = function(_) {
         var that = this;
-	if (!arguments.length) return sumTypes;
-	sumTypes = _;
+	if (!arguments.length) return xlabel_text;
+	xlabel_text = _;
+	return that;
+    }
+
+    var ylabel_text = "Word Rank";
+    var _ylabel_text = function(_) {
+        var that = this;
+	if (!arguments.length) return ylabel_text;
+	ylabel_text = _;
 	return that;
     }
     var _refH = function(_) {
@@ -264,6 +256,17 @@ hedotools.shifter = function()
 	if (!arguments.length) return reset;
 	reset = _;
 	return that;
+    }
+
+    var get_word_index = function(w) {
+        var ind = -1;
+        for (var i=0; i<words.length; i++) {
+            if (w === words[i]) {
+                ind = i;
+                break;
+            }
+        }
+        return ind;
     }
 
     var resetbuttontoggle = function(_) {
@@ -506,13 +509,13 @@ hedotools.shifter = function()
 	    // console.log(words);
 	    sortedWords = sortedWords.map(function(d,i) { 
 		if (sortedType[i] == 0) {
-		    return ((i+1)+". ").concat(d.concat("-\u2193"));
+		    return ((i+1)+". ").concat(d.concat("-\u2193")); // down // increase in happs
 		} 
 		else if (sortedType[i] == 1) {
-		    return ((i+1)+". ").concat(d.concat("+\u2193"));
+		    return ((i+1)+". ").concat(d.concat("+\u2193")); // decrease in happs
 		}
 		else if (sortedType[i] == 2) {
-		    return ((i+1)+". ").concat(d.concat("-\u2191"));
+		    return ((i+1)+". ").concat(d.concat("-\u2191")); // up
 		} else {
 		    return ((i+1)+". ").concat(d.concat("+\u2191"));
 		}
@@ -683,6 +686,7 @@ hedotools.shifter = function()
     }
     
     var shifter = function() {
+        // console.log("running the shifter");
         var that = this;
 	/* shift two frequency vectors
 	   -assume they've been zero-ed for stop words
@@ -778,7 +782,7 @@ hedotools.shifter = function()
 		}
 	    }
 	    else {
-		sortedWords[i] = tmpword;		
+		sortedWords[i] = tmpword;	
 	    }
 	}
 
@@ -820,6 +824,10 @@ hedotools.shifter = function()
 	//     refH: refH,
 	//     compH: compH,
 	// };
+
+        sortedWordsRaw = sortedWords;
+        sortedWordsRawEn = sortedWordsEn;
+	concatter();
 
 	// allow chaining here too
 	return that;
@@ -1103,6 +1111,183 @@ hedotools.shifter = function()
 	return that;
     }
 
+    var word_paragraph = function(i) {
+        var this_type = sortedType[i];
+        return "The word \""+
+            (sortedWordsRaw[i])+
+            "\", shown as \""+
+            (sortedWords[i])+
+            "\", is a "+
+            (((this_type == 1) || (this_type == 3)) ? "more happy word (+)" : "less happy word (-)")+
+            " than the reference average, and was used "+
+            ((this_type > 1) ? "more frequently (\u2191)" : "less frequently (\u2193)")+
+            " in the comparion, bringing the comparison happiness "+
+            (((this_type == 0) || (this_type == 2)) ? "up" : "down")+
+            " by "+
+            (Math.abs(sortedMag[i]/(Math.abs(refH-compH))).toFixed(2))+
+            "%.";
+    }
+
+    var word_list = function(i) {
+        var this_type = sortedType[i];
+        var sign = ((this_type == 1) || (this_type == 3)) ? "+" : "-";
+        var morelesshappy = ((this_type == 1) || (this_type == 3)) ? "more" : "less";;
+        var frequency = (this_type > 1) ? "\u2191" : "\u2193";
+        var morelessfreq = (this_type > 1) ? "more" : "less";
+        var updown = (sortedMag[i] > 0) ? "up" : "down";
+        var risefall = (sortedMag[i] > 0) ? "rise" : "fall";
+        var leftright = (sortedMag[i] > 0) ? "right" : "left";
+        var index = my_shifter.get_word_index(sortedWordsRaw[i]);
+        return "The word \""+
+            (sortedWordsRaw[i])+
+            "\" is shown as \""+
+            (sortedWords[i])+
+            "\". Let's break that down: <br>"+
+            "<ul>"+
+            // "<li>The "+sign+" means "+sortedWordsRaw[i]+" is a "+morelesshappy+" happy word ($h_{\\textrm{avg}} {("+sortedWordsRaw[i]+")}=$"+lens[index].toFixed(2)+")"+
+            "<li>The "+sign+" means "+sortedWordsRaw[i]+" is a "+morelesshappy+" happy word"+
+            " than the reference average ($h_{\\textrm{avg}} {(\\textrm{"+sortedWordsRaw[i]+"})}="+lens[index].toFixed(2)+"$ and $h^{\\textrm{(ref)}}_{\\textrm{avg}}="+refH.toFixed(2)+"$).</li><li>The "+
+            ((this_type > 1) ? "\u2191 means used more" : "\u2193 means used less")+
+            "  frequently in the comparison text than reference text ("+commaSeparateNumber(compF[index])+" times to "+commaSeparateNumber(refF[index])+" times, such that "+
+            "$p_\\textrm{"+sortedWordsRaw[i]+"}^{\\textrm{(comp)}} = "+(compF[index]/d3.sum(compF)).toFixed(3)+"$ and "+ "$p_\\textrm{"+sortedWordsRaw[i]+"}^{\\textrm{(ref)}}="+(refF[index]/d3.sum(refF)).toFixed(3)+"$"+
+            ").</li><li>Together"+
+            // ((this_type > 1) ? " (more" : " (less")+
+            // ", "+
+            // (((this_type == 1) || (this_type == 3)) ? "positive) " : "negative) ")+
+            " this brings the comparison happiness <strong>"+
+            ((sortedMag[i] > 0) ? "up" : "down")+
+            "</strong> by "+
+            (Math.abs(sortedMag[i])).toFixed(3)+
+            ", or "+
+            (Math.abs(sortedMag[i]/(refH-compH)).toFixed(2))+
+            "%. We can see this as the individual term in the shift equations' sum: "+
+            '  $$\\underbrace{'+
+            '  \\left['+
+            '  h_{\\textrm{avg}} {(\\textrm{'+sortedWordsRaw[i]+'})} – h^{\\textrm{(ref)}}_{\\textrm{avg}}'+
+            '  \\right]'+
+            '  }_{'+sign+'}'+
+            '  \\underbrace{'+
+            '  \\left['+
+            '  p_\\textrm{'+sortedWordsRaw[i]+'}^{\\textrm{(comp)}} – p_\\textrm{'+sortedWordsRaw[i]+'}^{\\textrm{(ref)}}'+
+            '  \\right]'+
+            '    }_{\\'+updown+'arrow}.$$'+
+            "</li></ul>"+
+            (((this_type == 1) || (this_type == 3)) ? "Positive, " : "Negative, ")+
+            ((this_type > 1) ? " more frequent (" : " less frequent (")+
+            sign+frequency+
+            ") words "+
+            " will always be on the "+
+            leftright+
+            " contributing to a "+
+            risefall+
+            " in happiness.";
+    }
+
+    var wordshift_tour = function() {
+        // function wordshift_tour() {
+        // Instance the tour
+        console.log("launching the tour");
+        var tour = new Tour({
+            steps: [
+                {
+                    element: "#shiftsvg",
+                    title: "A quick wordshift whats-what",
+                    placement: "auto left",
+                    onShown: function() {
+                        console.log("first element shown");
+                        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                    },
+                    // content: MathJax.HTML.Element("div",null,['We generate the wordshift from this equation: $$h^{\\textrm{(comp)}}_{\\textrm{avg}} – h^{\\textrm{(ref)}}_{\\textrm{avg}} = $$'])
+                    // content: "We generate the wordshift from this equation: $$h^{\\textrm{(comp)}}_{\\textrm{avg}} – h^{\\textrm{(ref)}}_{\\textrm{avg}} = $$"
+
+                    content: "Let’s say we have two texts which we call ‘reference’, ${T}^\\textrm{(ref)}$, and ‘comparison’, ${T}^\\textrm{(comp)}$. We want to know why the happiness of the comparison text, $h^{\\textrm{(comp)}}_{\\textrm{avg}}$, is higher or lower than that of the reference text $h^{\\textrm{(ref)}}_{\\textrm{avg}}$."+
+                        "<br>To do this, we analyze how each word $w$ which contributes to the difference in average happiness between the two texts:"+
+                        '  $$h^{\\textrm{(comp)}}_{\\textrm{avg}} – h^{\\textrm{(ref)}}_{\\textrm{avg}} = '+
+                        '  \\sum_{w \\in L}'+
+                        '  \\underbrace{'+
+                        '  \\left['+
+                        '  h_{\\textrm{avg}} {(w)} – h^{\\textrm{(ref)}}_{\\textrm{avg}}'+
+                        '  \\right]'+
+                        '  }_{+/-}'+
+                        '  \\underbrace{'+
+                        '  \\left['+
+                        '  p_w^{\\textrm{(comp)}} – p_w^{\\textrm{(ref)}}'+
+                        '  \\right]'+
+                        '    }_{\\uparrow/\\downarrow}.$$'+
+                        'Next let\'s take a look at how the top three words contribute.'
+                },
+                {
+                    element: "#shiftrect0",
+                    // title: "Word with the greatest individual contribution",
+                    content: word_list(0),
+                    placement: "auto left",
+                    onShown: function() {
+                        console.log("first element shown");
+                        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                    },
+                },
+                {
+                    element: "#shiftrect1",
+                    // title: "Second word",
+                    content: word_list(1),
+                    placement: "auto left",
+                    onShown: function() {
+                        console.log("first element shown");
+                        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                    },
+                },
+                {
+                    element: "#shiftrect2",
+                    // title: "Third word",
+                    content: word_list(2),
+                    placement: "auto left",
+                    onShown: function() {
+                        console.log("first element shown");
+                        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                    },
+                },
+                {
+                    element: "#sumTextR0",
+                    // title: "Third word",
+                    content: "At the top, we see the relative contributions from each of the four words types, and the total (the grey bar). This particular bar, $\\sum +\\uparrow$, shows the relative contribution to the shift in happiness from positive words that increased in frequency. <br><br>Try clicking this bar to see only those word types. To reset the view, click the grey $\\sum$ bar.<br><br>And that's all for now, we hope this quick what's-what was helpful!",
+                    placement: "auto left",
+                    onShown: function() {
+                        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                    },
+                }
+            ]});
+
+        // Initialize the tour
+        tour.init();
+
+        // Start the tour
+        // force it, since it's an option
+        tour.restart();
+        tour.start(true);
+    }
+
+    var add_help_button = function() {
+        // this requires bootstrap for stying
+        // it requires fontawesome for the icon
+        // requires bootstrap, bootstrap-tour for the tour
+        // and it requires mathjax for the equations
+        figure.append("a")
+            .attr({"class": "btn btn-large btn-default"})
+            .style({
+                "position": "absolute",
+                // this position starts from the padding on the left
+                // so inside a bootstrap col, this is 15px too far left
+                "left": function() { return (fullwidth-34)+"px"; },
+            })
+            .on("click",function() {
+                wordshift_tour();
+            })
+            .append("i")
+            .attr({"class": "fa fa-question"});
+        
+        // <a class="btn btn-large btn-default" style= onclick="wordshift_tour();"><i class="fa fa-question" aria-hidden="true"></i></a>
+    }
+
     var plot = function() {
         var that = this;
 	/* plot the shift
@@ -1173,10 +1358,6 @@ hedotools.shifter = function()
 	// take the longest of the top five words
 	// console.log("appending to sorted words");
 	// console.log(sortedWords);
-
-        sortedWordsRaw = sortedWords;
-        if (translate) { sortedWordsEnRaw = sortedWordsEn; }
-	concatter();
 
 	maxWidth = d3.max(sortedWords.slice(0,7).map(function(d) { return d.width(wordfontsize + "px Latex default"); }));
 
@@ -1305,6 +1486,7 @@ hedotools.shifter = function()
 		//     else { return x(d)}
 		// },
 		// "y": function(d,i) { return y(i+1); },
+                "id": function(d,i) { return "shiftrect"+i; },
                 "x": 0,
                 "y": 0,
                 "transform": function(d,i) {
@@ -1641,6 +1823,7 @@ hedotools.shifter = function()
 	//.attr("y",function(d,i) { if (i<2) {return i*17+17;} else if ((sumTypes[3]+sumTypes[1])*(sumTypes[0]+sumTypes[2])<0) {return i*17+33; } else {return i*17+33; } })
 	// for only three days
             .attr({"class": "sumtextR",
+                   "id": function(d,i) { return "sumTextR"+i; },
 	           "y": function(d,i) { return i*17+17; },
                    "x": function(d,i) { return topScale(d)+5*d/Math.abs(d); },})
 	    .text(function(d,i) { if (i == 0) {return "\u2211+\u2191";} if (i==1) { return"\u2211-\u2193";} else { return "\u2211";} } );
@@ -1657,6 +1840,7 @@ hedotools.shifter = function()
 	    .append("rect")
 	    .attr({
 		"class": function(d,i) { return "sumrectL "+intStr0[i]+" "+typeClass[i]; },
+                "id": function(d,i) { return "sumTextL"+i; },
 		"x": function(d,i) { 
 		    if (i<2) { 
 			return topScale(d);
@@ -2585,10 +2769,6 @@ hedotools.shifter = function()
 	    // console.log(comparisonText);
 	}
 
-        sortedWords = sortedWordsRaw;
-        if (translate) { sortedWords = sortedWordsRaw; }
-	concatter();
-
 	// could set a cap to make sure no 0"s
 	maxWidth = d3.max(sortedWords.slice(0,5).map(function(d) { return d.width(wordfontsize + "px Latex default"); }));
 
@@ -2701,6 +2881,9 @@ hedotools.shifter = function()
 
 	var newbars = axes.selectAll("rect.shiftrect").data(sortedMag);
 	var newwords = axes.selectAll("text.shifttext").data(sortedMag);
+        // console.log(sortedWords);
+        // console.log(sortedMag);
+        // console.log(compF);
 	
 	// if we haven't dont a subselection, apply with a transition
 	if (shiftseldecoder().current === "none" || shiftseldecoder().current.length === 0) {
@@ -2987,6 +3170,7 @@ hedotools.shifter = function()
 		    setfigure: setfigure,
 		    setdata: setdata,
 		    plot: plot,
+                    add_help_button: add_help_button,
 		    show_x_axis: show_x_axis,
 		    replot: replot,
                     table: table,
@@ -3007,10 +3191,6 @@ hedotools.shifter = function()
 		    _words: _words,
 		    _words_en: _words_en,
 		    // boatload more accessor functions
-		    _sortedMag: _sortedMag,
-		    _sortedType: _sortedType,
-		    _sortedWords: _sortedWords,
-		    _sumTypes: _sumTypes,
 		    _refH: _refH,
 		    _compH: _compH,
 		    _xlabel_text: _xlabel_text,
@@ -3024,6 +3204,11 @@ hedotools.shifter = function()
                     setFontSizes: setFontSizes,
                     _viz_type_use_URL: _viz_type_use_URL,
                     _my_shift_id: _my_shift_id,
+                    _sortedMag: _sortedMag,
+                    _sortedType: _sortedType,
+                    _sortedWords: _sortedWords,
+                    _sortedWordsRaw: _sortedWordsRaw,
+                    get_word_index: get_word_index,
 		  }
     return opublic;
 };
@@ -3123,3 +3308,5 @@ function indexer2d(a,w,i,ip,j,jp) {
 
 // my_array = Array(10000);
 // for (var i=0; i<my_array.length; i++) { my_array[i] = i; }
+
+
