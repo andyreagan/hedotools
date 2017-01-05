@@ -51,10 +51,15 @@ hedotools.shifter = function()
     var figure = d3.select("body");
 
     var widthsetexplicitly = false;
+    var getfigure = function() {
+        return figure;
+    }
     var setfigure = function(_) {
         var that = this;
-	// console.log("setting figure");
+	console.log("setting figure for wordshift");
 	figure = _;
+        // wrap another relative parent div in there, for the overlay button to pad off of
+        figure = figure.append("div").attr({"class":"outwrapper"}).style({"position":"relative"});
 	if (!widthsetexplicitly) {
 	    grabwidth();
 	}
@@ -77,7 +82,7 @@ hedotools.shifter = function()
 	// and a max width w (in pixels)
 	// 
 	// return the strings split into an array
-	var font = f || (topFontSizeArray[topFontSizeArray.length-1]+"px Latex default");
+	var font = f || (topFontSizeArray[topFontSizeArray.length-1]+"px  "+fontString);
         // console.log(w);
         // console.log(f);
 	var splitar = [];
@@ -123,8 +128,8 @@ hedotools.shifter = function()
     // but just initialize the width-related variables
 
     // full width and height. we'll draw the outer svg this big
-    var fullwidth = 700;
-    var fullheight = 500 // 650; // make sure to change num words too
+    var fullwidth = 400;
+    var fullheight = 550 // 650; // make sure to change num words too
 
     var margin = {top: 0, right: 0, bottom: 0, left: 0};
 
@@ -144,7 +149,7 @@ hedotools.shifter = function()
     // individual bar height, and number of words
     // need to be tuned to the height of the plot
     var iBarH = 11;
-    var numWords = 23; // 37 with height 650
+    var numWords = 28; // 37 with height 650 // 23 with height 500
     // I should be able to compute this?
 
     // max length of words to plot
@@ -269,11 +274,14 @@ hedotools.shifter = function()
         return ind;
     }
 
-    var resetbuttontoggle = function(_) {
+    // let's make this just toggle the state
+    // you can force it to turn on by setting the _reset function
+    // to set the reset bool to be false, then calling toggle
+    var resetbuttontoggle = function() {
         var that = this;
-	if (!arguments.length) return reset;
-	resetButton(_);
-	if (_) {
+        reset = !reset;
+	resetButton(reset);
+	if (reset) {
 	    figure.select("g.help").style("visibility","visible");
 	    figure.selectAll("text.credit").style("visibility","visible");	    
 	}
@@ -602,7 +610,7 @@ hedotools.shifter = function()
             refH += refF[i]*parseFloat(lens[i]);
 	}
 	refH = refH/Nref;
-	compH = 0.000;
+	compH = 0.0;
 
 	// do the shifting
 	shiftMag = Array(lensLength);
@@ -1046,6 +1054,13 @@ hedotools.shifter = function()
     var sepline;
     var zoom;
     var axes;
+    var fontString = "Latex default, serif";
+    var _fontString = function(_) {
+        var that = this;
+        if (!arguments.length) return fontString;
+        fontString = _;
+        return that;
+    }
     // the inspector computed width of ∑+↓ rendering in latex default (cmr10)
     var sumTextWidth = 34.1562;
     // these are set explicitly on the elements
@@ -1288,6 +1303,7 @@ hedotools.shifter = function()
         // <a class="btn btn-large btn-default" style= onclick="wordshift_tour();"><i class="fa fa-question" aria-hidden="true"></i></a>
     }
 
+    
     var plot = function() {
         var that = this;
 	/* plot the shift
@@ -1359,7 +1375,7 @@ hedotools.shifter = function()
 	// console.log("appending to sorted words");
 	// console.log(sortedWords);
 
-	maxWidth = d3.max(sortedWords.slice(0,7).map(function(d) { return d.width(wordfontsize + "px Latex default"); }));
+	maxWidth = d3.max(sortedWords.slice(0,7).map(function(d) { return d.width(wordfontsize + "px  "+fontString); }));
 
 	// a little extra padding for the words
 	var xpadding = 10;
@@ -2193,6 +2209,7 @@ hedotools.shifter = function()
 	}
 
 	if (translate) {
+            console.log(translate);
 	    translateButton();
 	}
 
@@ -2263,7 +2280,7 @@ hedotools.shifter = function()
     }; // resetButton
 
     function translateButton() {
-
+        console.log("adding the translate button");
 	var translateGroup = canvas.append("g")
 	    .attr("class","translatebutton")
 	    .attr("transform","translate("+(4)+","+(136+toptextheight)+") rotate(-90)");
@@ -2389,7 +2406,7 @@ hedotools.shifter = function()
             a.size = sizeScale(Math.abs(sortedMag[i]));
             // set the font style using a single string
             // https://developer.mozilla.org/en-US/docs/Web/CSS/font
-            a.fontString = a.size+"px \"cmr10\", serif";
+            a.fontString = a.size+"px  "+fontString;
             // don't let them touch
             a.padding = 1;
             // initially space them along the horizontal line
@@ -2759,18 +2776,18 @@ hedotools.shifter = function()
 	    }
 
 	    // console.log("generating text for wordshift");
-	    comparisonText = splitstring(["Reference happiness: "+refH.toFixed(2),"Comparison happiness: "+compH.toFixed(2),"Why comparison is "+happysad+" than reference:"],boxwidth-10-logowidth,"14px Latex default");
+	    comparisonText = splitstring(["Reference happiness: "+refH.toFixed(2),"Comparison happiness: "+compH.toFixed(2),"Why comparison is "+happysad+" than reference:"],boxwidth-10-logowidth,"14px  "+fontString);
 	    // console.log(comparisonText);
 	}
 	else {
 	    if ( split_top_strings ) {
-		comparisonText = splitstring(comparisonText,boxwidth-10-logowidth,"14px Latex default");
+		comparisonText = splitstring(comparisonText,boxwidth-10-logowidth,"14px  "+fontString);
 	    }
 	    // console.log(comparisonText);
 	}
 
 	// could set a cap to make sure no 0"s
-	maxWidth = d3.max(sortedWords.slice(0,5).map(function(d) { return d.width(wordfontsize + "px Latex default"); }));
+	maxWidth = d3.max(sortedWords.slice(0,5).map(function(d) { return d.width(wordfontsize + "px  "+fontString); }));
 
 	var xpadding = 10;
 	// linear scale function
@@ -3168,6 +3185,7 @@ hedotools.shifter = function()
 		    shifter: shifter,
 		    selfShifter: selfShifter,
 		    setfigure: setfigure,
+                    getfigure: getfigure,
 		    setdata: setdata,
 		    plot: plot,
                     add_help_button: add_help_button,
@@ -3202,6 +3220,7 @@ hedotools.shifter = function()
 		    _shiftType: _shiftType,
 		    dualShifter: dualShifter,
                     setFontSizes: setFontSizes,
+                    _fontString: _fontString,
                     _viz_type_use_URL: _viz_type_use_URL,
                     _my_shift_id: _my_shift_id,
                     _sortedMag: _sortedMag,
