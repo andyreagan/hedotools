@@ -351,6 +351,14 @@ hedotools.shifter = function()
 	return that;
     }
 
+    var bgcolor = "white";
+    var setBgcolor = function(_) {
+        var that = this;
+	if (!arguments.length) return bgcolor;
+	bgcolor = _;
+	return that;
+    }
+
     var setTopTextSizes = function(_) {
         var that = this;
 	if (!arguments.length) return topFontSizeArray;
@@ -1361,7 +1369,7 @@ hedotools.shifter = function()
 	    .attr("width", boxwidth)
 	    .attr("height", boxheight)
 	    .attr("class", "bgbg")
-	    .attr("fill", "white");
+	    .attr("fill", bgcolor);
 
 	toptextheight = comparisonText.length*17+13;
 	// console.log(toptextheight);
@@ -1436,9 +1444,9 @@ hedotools.shifter = function()
 	           "height":  figheight-2,
 	           "class":  "bg",})
 	    .style({"stroke-width":"0.5",
-                    "stroke":"rgb(0,0,0)",
-                    "fill": "#FCFCFC",
-                    "opacity": "0.96"});
+                       "stroke":"rgb(0,0,0)",
+                       "fill": bgcolor,
+                       "opacity": ".96"});
 
 	if (show_x_axis_bool) {
 	    // axes creation functions
@@ -1625,9 +1633,9 @@ hedotools.shifter = function()
 	
 	// draw a white rectangle to hide the shift bars behind the summary shifts
 	// move x,y to 3 and width to -6 to give the bg a little space
-	topbgrect = axes.append("rect").attr("x",3).attr("y",3).attr("width",figwidth-axeslabelmargin.left-5).attr("height",73-13).attr("fill","white").style({"opacity": "1.0"});
+	topbgrect = axes.append("rect").attr("x",3).attr("y",3).attr("class","topbgrect").attr("width",figwidth-axeslabelmargin.left-5).attr("height",73-13).attr("fill",bgcolor).style({"opacity": "1.0"});
 
-	topbgrect2 = canvas.append("rect").attr("x",0).attr("y",0).attr("width",boxwidth).attr("height",toptextheight).attr("fill","white").style({"opacity": "1.0"});
+	topbgrect2 = canvas.append("rect").attr("x",0).attr("y",0).attr("class","topbgrect").attr("width",boxwidth).attr("height",toptextheight).attr("fill",bgcolor).style({"opacity": "1.0"});
 
 	// draw the text on top of this rect
 	toptext = canvas.selectAll("text.titletext")
@@ -1670,7 +1678,7 @@ hedotools.shifter = function()
             .attr("y",fullheight-axeslabelmargin.bottom-toptextheight)
             .attr("width",figwidth-2)
             .attr("height",axeslabelmargin.bottom)
-            .attr("fill","white")
+            .attr("fill",bgcolor)
             .style({"opacity": "1.0"});
 
 	// draw the summary things
@@ -3196,6 +3204,7 @@ hedotools.shifter = function()
 		    setText: setText,
 		    setWidth: setWidth,
 		    setHeight: setHeight,
+                    setBgcolor: setBgcolor,
 		    splitstring: splitstring,
 		    drawlogo: drawlogo,
 		    resetbuttontoggle: resetbuttontoggle,
