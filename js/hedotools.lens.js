@@ -46,8 +46,8 @@ hedotools.lens = function() {
     // since they're all a bit different
     var page = "geo";
 
-    var encoder = d3.urllib.encoder().varname("lens"); //.varval(lensExtent);
-    var decoder = d3.urllib.decoder().varname("lens").varresult([4,6]); //.varval(lensExtent);
+    var encoder = hedotools.urllib.encoder().varname("lens"); //.varval(lensExtent);
+    var decoder = hedotools.urllib.decoder().varname("lens").varresult([4,6]); //.varval(lensExtent);
 
     var figure;
     var lens;

@@ -22,15 +22,15 @@
 hedotools.shifter = function()
 {
     // for the word type selection
-    var shiftselencoder = d3.urllib.encoder().varname("wordtypes");
-    var shiftseldecoder = d3.urllib.decoder().varname("wordtypes").varresult("none");
+    var shiftselencoder = hedotools.urllib.encoder().varname("wordtypes");
+    var shiftseldecoder = hedotools.urllib.decoder().varname("wordtypes").varresult("none");
     // initialize that we have't selected a shift
     var shiftTypeSelect = false;
     var shiftType = -1;
 
     // put the status of the viz into the bar
-    var viz_type = d3.urllib.encoder().varname("viz");
-    var viz_type_decoder = d3.urllib.decoder().varname("viz").varresult("wordshift");
+    var viz_type = hedotools.urllib.encoder().varname("viz");
+    var viz_type_decoder = hedotools.urllib.decoder().varname("viz").varresult("wordshift");
     var viz_type_use_URL = false;
     // if (viz_type_use_URL) {
     // }

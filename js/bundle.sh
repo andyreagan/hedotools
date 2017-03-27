@@ -1,6 +1,6 @@
 # version them with d3 versions
-cat urllib.js hedotools.init.js hedotools.barchart.js hedotools.lens.js hedotools.map.js hedotools.sankey.js hedotools.shifter.js  > hedotools.v3.js
-cat urllib.js hedotools.init.v4.js hedotools.shifter.v4.js > hedotools.v4.js
+cat hedotools.init.js hedotools.urllib.js hedotools.barchart.js hedotools.lens.js hedotools.map.js hedotools.sankey.js hedotools.shifter.js  > hedotools.v3.js
+cat hedotools.init.v4.js hedotools.urllib.js hedotools.shifter.v4.js > hedotools.v4.js
 # minify
 node ../node_modules/minifier/index.js hedotools.v3.js
 node ../node_modules/minifier/index.js hedotools.v4.js
