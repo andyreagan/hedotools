@@ -584,7 +584,7 @@ hedotools.barchart = function() {
 		    plot: plot, };
 
     return opublic;
-}();
+};
 
 
 
@@ -946,7 +946,7 @@ hedotools.lens = function() {
 		  };
 
     return opublic;
-}();
+};
 hedotools.map = function() {
 
     var figure;
@@ -1516,7 +1516,7 @@ hedotools.map = function() {
 
     return opublic;
 
-}();
+};
 
 
 
@@ -2065,8 +2065,7 @@ hedotools.sankey = function() {
     };
 
     return opublic;
-
-}();
+};
 
 
 

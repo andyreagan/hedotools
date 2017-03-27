@@ -336,7 +336,7 @@ hedotools.barchart = function() {
 		    plot: plot, };
 
     return opublic;
-}();
+};
 
 
 

@@ -567,7 +567,7 @@ hedotools.map = function() {
 
     return opublic;
 
-}();
+};
 
 
 
