@@ -8,6 +8,10 @@ hedotools.map = function() {
 	return hedotools.map;
     }
 
+    var classColor = d3.scale.quantize()
+        .range([0,1,2,3,4,5,6])
+        .domain([50,1]);
+
     var geoJson;
 
     var setdata = function(_) {
@@ -563,7 +567,7 @@ hedotools.map = function() {
 
     return opublic;
 
-}();
+};
 
 
 

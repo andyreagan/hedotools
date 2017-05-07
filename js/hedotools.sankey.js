@@ -540,8 +540,7 @@ hedotools.sankey = function() {
     };
 
     return opublic;
-
-}();
+};
 
 
 
