@@ -5,6 +5,7 @@ cat hedotools.init.v4.js hedotools.urllib.js hedotools.shifter.v4.js > hedotools
 node ../node_modules/minifier/index.js hedotools.v3.js
 node ../node_modules/minifier/index.js hedotools.v4.js
 # link
+rm hedotools.js hedotools.min.js
 ln -s hedotools.v3.js hedotools.js
 ln -s hedotools.v3.min.js hedotools.min.js
 
