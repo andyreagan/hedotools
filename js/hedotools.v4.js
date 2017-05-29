@@ -1621,7 +1621,14 @@ hedotools.shifter = function()
 	    .attr("height",function () { return boxheight; });
 	
 	// this one will be white, and behind EVERYTHING
-        var bgcolor = "rgba(255,248,220,.2)";
+        // var bgcolor = "rgba(255,248,220,.2)";
+        var bgcolor = "white";
+        var setBgcolor = function(_) {
+            var that = this;
+	    if (!arguments.length) return bgcolor;
+	    bgcolor = _;
+	    return that;
+        }
 	bgbgrect = canvas.append("rect")
 	    .attr("x",0)
 	    .attr("y",0)
@@ -3458,6 +3465,7 @@ hedotools.shifter = function()
 		    setText: setText,
 		    setWidth: setWidth,
 		    setHeight: setHeight,
+                    setBgcolor: setBgcolor,
 		    splitstring: splitstring,
 		    drawlogo: drawlogo,
 		    resetbuttontoggle: resetbuttontoggle,
