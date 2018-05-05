@@ -1304,7 +1304,15 @@ hedotools.shifter = function()
         // <a class="btn btn-large btn-default" style= onclick="wordshift_tour();"><i class="fa fa-question" aria-hidden="true"></i></a>
     }
 
-    
+    // var bgcolor = "rgba(255,248,220,.2)";
+    var bgcolor = "white";
+    var setBgcolor = function(_) {
+        var that = this;
+	if (!arguments.length) return bgcolor;
+	bgcolor = _;
+	return that;
+    }
+
     var plot = function() {
         var that = this;
 	/* plot the shift
@@ -1356,14 +1364,6 @@ hedotools.shifter = function()
 	    .attr("height",function () { return boxheight; });
 	
 	// this one will be white, and behind EVERYTHING
-        // var bgcolor = "rgba(255,248,220,.2)";
-        var bgcolor = "white";
-        var setBgcolor = function(_) {
-            var that = this;
-	    if (!arguments.length) return bgcolor;
-	    bgcolor = _;
-	    return that;
-        }
 	bgbgrect = canvas.append("rect")
 	    .attr("x",0)
 	    .attr("y",0)
