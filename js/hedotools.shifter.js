@@ -1,24 +1,3 @@
-// current usage example:
-// (from the sankey page)
-//
-// hedotools.shifter.shift(allDataOld[hedotools.sankey.newindices()[0]].freq,allDatra[hedotools.sankey.newindices()[0]].freq,lens,words);
-// hedotools.shifter.setfigure(d3.select("#shift01")).setHeight(400).setText("Why "+allDataOld[hedotools.sankey.newindices()[0]].name+" has become "+"happier"+":").plot();
-//
-// there are two options for having it compute the shift
-// calling the .shift() with four arguments does the trick
-// or calling .shifter() with no arguments also does
-// for the latter, need to have defined the variables beforehand
-// using the _lens, _words, etc accessors
-//
-// if the text isn't set, will attempt to grab it using the
-// allData structure (which works in the maps.html)
-//
-// the text setting here removes all p instances in the figure,
-// and then inserts a new one before the svg, inside the figure (using d3.insert)
-//
-// can also use the setText method to set the text
-
-// define the shifter module
 hedotools.shifter = function() {
     // for the word type selection
     var shiftselencoder = hedotools.urllib.encoder().varname("wordtypes");
@@ -31,8 +10,6 @@ hedotools.shifter = function() {
     var viz_type = hedotools.urllib.encoder().varname("viz");
     var viz_type_decoder = hedotools.urllib.decoder().varname("viz").varresult("wordshift");
     var viz_type_use_URL = false;
-    // if (viz_type_use_URL) {
-    // }
     var _viz_type_use_URL = function(_) {
         var that = this;
         if (!arguments.length) return viz_type_use_URL;
