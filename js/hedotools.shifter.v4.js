@@ -4036,6 +4036,3 @@ function indexer2d(a, w, i, ip, j, jp) {
     }
     return result;
 }
-
-// my_array = Array(10000);
-// for (var i=0; i<my_array.length; i++) { my_array[i] = i; }
