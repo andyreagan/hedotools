@@ -223,10 +223,16 @@ hedotools.shifter = function() {
         sortedWordsEn = _;
         return that;
     }
-    var _sortedWordsRawEn = function(_) {
+    var _sortedWordsEnRaw = function(_) {
         var that = this;
-        if (!arguments.length) return sortedWordsRawEn;
-        sortedWordsRawEn = _;
+        if (!arguments.length) return sortedWordsEnRaw;
+        sortedWordsEnRaw = _;
+        return that;
+    }
+    var _sumTypes = function(_) {
+        var that = this;
+        if (!arguments.length) return sumTypes;
+        sumTypes = _;
         return that;
     }
     var _refH = function(_) {
