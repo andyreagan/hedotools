@@ -213,6 +213,8 @@ hedotools.shifter = function() {
     var sumTypes;
     var refH;
     var compH;
+    var xlabel_text = "Per word average happiness shift";
+    var ylabel_text = "Word Rank";
 
     var _sortedMag = function(_) {
         var that = this;
@@ -238,20 +240,16 @@ hedotools.shifter = function() {
         sortedWordsRaw = _;
         return that;
     }
-
-    var xlabel_text = "Per word average happiness shift";
-    var _xlabel_text = function(_) {
+    var _sortedWordsEn = function(_) {
         var that = this;
-        if (!arguments.length) return xlabel_text;
-        xlabel_text = _;
+        if (!arguments.length) return sortedWordsEn;
+        sortedWordsEn = _;
         return that;
     }
-
-    var ylabel_text = "Word Rank";
-    var _ylabel_text = function(_) {
+    var _sortedWordsRawEn = function(_) {
         var that = this;
-        if (!arguments.length) return ylabel_text;
-        ylabel_text = _;
+        if (!arguments.length) return sortedWordsRawEn;
+        sortedWordsRawEn = _;
         return that;
     }
     var _refH = function(_) {
@@ -264,6 +262,18 @@ hedotools.shifter = function() {
         var that = this;
         if (!arguments.length) return compH;
         compH = _;
+        return that;
+    }
+    var _xlabel_text = function(_) {
+        var that = this;
+        if (!arguments.length) return xlabel_text;
+        xlabel_text = _;
+        return that;
+    }
+    var _ylabel_text = function(_) {
+        var that = this;
+        if (!arguments.length) return ylabel_text;
+        ylabel_text = _;
         return that;
     }
 
