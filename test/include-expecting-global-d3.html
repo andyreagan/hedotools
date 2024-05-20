@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+
+<body>
+    <div id="thisdiv">
+    </div>
+    <script src="../node_modules/d3/build/d3.js"></script>
+    <script src="../node_modules/d3-selection-multi/build/d3-selection-multi.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../js/hedotools.init.v4.js"></script>
+    <script src="../js/hedotools.urllib.js"></script>
+    <script src="../js/hedotools.shifter.v4.js"></script>
+    <script type="text/javascript">
+        my_shifter = hedotools.shifter()
+        my_shifter.setfigure(d3.select("#thisdiv"));
+
+        var lens = [8.50, 8.44, 8.42, 8.30, 8.26, 8.22, 8.20, 8.18, 8.18, 8.16];
+        var words = ["laughter", "happiness", "love", "happy", "laughed", "laugh", "laughing", "excellent", "laughs", "joy"];
+        var refF = [29, 174, 6331, 2196, 48, 277, 471, 47, 27, 58, 85];
+        var compF = [15, 142, 5788, 1913, 56, 305, 362, 35, 31, 54];
+
+        my_shifter._refF(refF);
+        my_shifter._compF(compF);
+        my_shifter._lens(lens);
+        my_shifter._words(words);
+
+
+        // my_shifter.plotdist(true);
+
+        // do the shifting
+        my_shifter.shifter();
+        my_shifter.setWidth(400);
+        // my_shifter.setHeight(800);
+
+        // don't use the default title
+        // set own title
+        // but leave all of the default sizes and labels
+
+        // extract these:
+        var compH = my_shifter._compH();
+        var refH = my_shifter._refH();
+        // from the code inside the shifter:
+        if (compH >= refH) {
+            var happysad = "happier";
+        } else {
+            var happysad = "less happy";
+        }
+
+        // also from inside the shifter:
+        // var comparisonText = splitstring(["Reference happiness: "+refH.toFixed(2),"Comparison happiness: "+compH.toFixed(2),"Why comparison is "+happysad+" than reference:"],boxwidth-10-logowidth,'14px arial');
+        // our adaptation:
+        var comparisonText = ["Example shift using LabMT", "", "Reference happiness: " + refH.toFixed(2), "Comparison happiness: " + compH.toFixed(2), "Why comparison is " + happysad + " than reference:"];
+        // set it:
+        my_shifter.setText(comparisonText);
+        my_shifter.setTextBold(0);
+        my_shifter.setTopTextSizes([24, 16, 16, 16, 16]);
+        my_shifter.setTextColors(["#D8D8D8", "#D8D8D8", "#D8D8D8", "#D8D8D8", "#D8D8D8", ]);
+        my_shifter.setFontSizes([16, 10, 22, 11, 8, 8, 13]);
+        // [bigshifttextsize,xaxisfontsize,xylabelfontsize,wordfontsize,distlabeltext,creditfontsize,resetfontsize];
+
+        my_shifter.plot();
+
+        window.setTimeout(function() {
+            console.log("replotting");
+            my_shifter._refF(refF.reverse());
+            my_shifter._compF(compF.reverse());
+            my_shifter.shifter();
+            my_shifter.replot();
+        }, 2000);
+    </script>
+</body>
+
+</html>

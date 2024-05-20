@@ -31,7 +31,7 @@ hedotools.urllib = {
 	var varval = [];
 	var show = true;
 	//var that = this;
-	
+
 	function urllib(d) {
 	    // nothing yet
 	    //console.log(this);
@@ -78,7 +78,7 @@ hedotools.urllib = {
 	    }
 
 	    urlString = urlString.substring(0,urlString.length-1);
-	    
+
 	    // only add to url if there is stuff
 	    if (urlString.length > 0) {
 		newDataUrl = baseUrl+"?"+urlString
@@ -115,7 +115,7 @@ hedotools.urllib = {
 	var varname = "tmp";
 	var varresult = [];
 	var defvalue = [];
-	
+
 	function urllib(d) {
 	    parseurl();
 	    return {current: varresult,
@@ -134,7 +134,7 @@ hedotools.urllib = {
 
 	    if (varname in GET) {
 		if (GET[varname].length > 0 && GET[varname][0] === "[") {
-		    if (GET[varname][GET[varname].length-1] === "]") { 
+		    if (GET[varname][GET[varname].length-1] === "]") {
 			var tmpArray = GET[varname].substring(1, GET[varname].length - 1).split(',');
 		    }
 		    else {

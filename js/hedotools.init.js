@@ -1,6 +1,3 @@
-// namespace it
-var hedotools = hedotools || {};
-
 // begin with some helper functions
 // http://stackoverflow.com/a/1026087/3780153
 function capitaliseFirstLetter(string)

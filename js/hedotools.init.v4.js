@@ -2,7 +2,7 @@
 var hedotools = hedotools || {};
 
 // hedonometer.org/maps.html needs this in hedotools.map.js
-var classColor = d3.scaleQuantize()		
+var classColor = d3.scaleQuantize()
     .range([0,1,2,3,4,5,6])
     .domain([50,1]);
 
@@ -26,17 +26,7 @@ String.prototype.width = function(font) {
     return w;
 }
 
-Array.prototype.findIndexClosest = function(x) {
-    var result = 0;
-    var distance = Math.abs(x-this[0]);
-    for (var i=1; i<this.length; i++) {
-        if (distance > Math.abs(x-this[i])) {
-            result = i;
-            distance = Math.abs(x-this[i]);
-        }
-    }
-    return result;
-}
+
 
 String.prototype.safe = function() {
     var tmp = this.split("/")
