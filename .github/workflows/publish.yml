@@ -1,0 +1,32 @@
+name: Publish to npm
+
+# Publishes @andyreagan/hedotools when a GitHub Release is published.
+# Uses npm Trusted Publishing (OIDC) — no NPM_TOKEN secret required.
+# The npm package's trusted-publisher config must point at this workflow
+# file (publish.yml) and the "npm" environment below.
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write # required for npm Trusted Publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+
+      # Trusted Publishing requires a recent npm (>= 11.5.1).
+      - run: npm install -g npm@latest
+
+      # The v3.x line is the frozen D3 v3 source — no build or test step.
+      # Lint/unit/browser tests get added here in v4 (mirroring d3-shifterator).
+      - run: npm publish --access public
