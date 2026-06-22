@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>hedotools barchart browser test fixture</title>
+    <style>
+        /* plot() reads the container's pixel width, so give it a fixed one */
+        #barchart { width: 600px; }
+    </style>
+</head>
+<body>
+    <div id="barchart"></div>
+
+    <!-- D3 v4 + jQuery from node_modules; then the namespace/helpers, then the module -->
+    <script src="../../node_modules/d3/build/d3.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../js/hedotools.init.v4.js"></script>
+    <script src="../../js/hedotools.barchart.js"></script>
+
+    <script type="text/javascript">
+        // Synthetic data: per-state happiness difference + matching geojson names.
+        var data = [0.12, -0.05, 0.30, -0.20, 0.02];
+        var geodata = [
+            { properties: { name: "Vermont" } },
+            { properties: { name: "Texas" } },
+            { properties: { name: "Hawaii" } },
+            { properties: { name: "Ohio" } },
+            { properties: { name: "Maine" } }
+        ];
+
+        // Accessors return the factory (not the instance), so call them as
+        // separate statements rather than chaining.
+        var bc = hedotools.barchart();
+        bc.setfigure(d3.select("#barchart"));
+        bc.setdata(data, geodata);
+        bc._figheight(400);
+        bc.plot();
+
+        window.__rendered = true;
+    </script>
+</body>
+</html>

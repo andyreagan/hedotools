@@ -134,12 +134,12 @@ hedotools.barchart = function() {
 
 	// x scale, maps all the data to 
 	var absDataMax = d3.max([d3.max(data),-d3.min(data)]);
-	var x = d3.scale.linear()
+	var x = d3.scaleLinear()
 	    .domain([-absDataMax,absDataMax])
 	    .range([5,width-10]);
 
 	// linear scale function
-	var y =  d3.scale.linear()
+	var y =  d3.scaleLinear()
 	    .domain([data.length,1])
 	    .range([height-20, 5]); 
 
@@ -174,15 +174,13 @@ hedotools.barchart = function() {
     	    .attr("x2", axeslabelmargin.left)
     	    .attr("y2", height)
     	//.attr("class", "bg")
-    	    .style({'stroke-width':'1','stroke':'rgb(10,10,10)'});
+    	    .style('stroke-width','1').style('stroke','rgb(10,10,10)');
     	//.attr("fill", "#FCFCFC");
 
 	// axes creation functions
 	var create_xAxis = function() {
-	    return d3.svg.axis()
-		.ticks(4)
-		.scale(x)
-		.orient("bottom"); }
+	    return d3.axisBottom(x)
+		.ticks(4); }
 
 	// // axis creation function
 	// var create_yAxis = function() {
@@ -192,8 +190,8 @@ hedotools.barchart = function() {
 
 	// // draw the axes
 	// var yAxis = create_yAxis()
-	// 	.innerTickSize(6)
-	// 	.outerTickSize(0);
+	// 	.tickSizeInner(6)
+	// 	.tickSizeOuter(0);
 
 	// axes.append("g")
 	// 	.attr("class", "y axis ")
@@ -204,14 +202,14 @@ hedotools.barchart = function() {
 	var xAxis;
 	if (manualTicks.length > 0) {
 	    xAxis = create_xAxis()
-		.innerTickSize(6)
-		.outerTickSize(0)
+		.tickSizeInner(6)
+		.tickSizeOuter(0)
 		.tickValues(manualTicks);
 	}
 	else {
 	    xAxis = create_xAxis()
-		.innerTickSize(6)
-		.outerTickSize(0);
+		.tickSizeInner(6)
+		.tickSizeOuter(0);
 	}
 
 	axes.append("g")
@@ -220,7 +218,7 @@ hedotools.barchart = function() {
 	    .attr("transform", "translate(0," + (height) + ")")
 	    .call(xAxis);
 
-	d3.selectAll(".tick line").style({'stroke':'black'});
+	d3.selectAll(".tick line").style('stroke','black');
 
 	// create the clip boundary
 	// var clip = axes.append("svg:clipPath")
@@ -263,15 +261,15 @@ hedotools.barchart = function() {
 	    .attr("class", function(d,i) { return d[2]+" staterect"+" q"+classColor(i+1)+"-8"; })
 	    .attr("x", function(d,i) { if (d[3]>0) { return figcenter; } else { return x(d[3]); } })
 	    .attr("y", function(d,i) { return y(i+1); })
-	    .style({'opacity':'1.0','stroke-width':'1.0','stroke':'rgb(100,100,100)'})
+	    .style('opacity','1.0').style('stroke-width','1.0').style('stroke','rgb(100,100,100)')
 	    .attr("height",function(d,i) { return 11; } )
 	    .attr("width",function(d,i) { if (d[3]>0) {return d3.max([x(d[3])-figcenter,0]);} else {return d3.max([figcenter-x(d[3]),0]); } } )
 	    .on('mouseover', function(d,i){
-		var rectSelection = d3.select(this).style({'opacity':'1.0','stroke':'black','stroke-width':'1.0',});
+		var rectSelection = d3.select(this).style('opacity','1.0').style('stroke','black').style('stroke-width','1.0');
 		hedotools.barchartoncall.test(d,i);
 	    })
 	    .on('mouseout', function(d){
-		var rectSelection = d3.select(this).style({'opacity':'1.0','stroke':'rgb(100,100,100)','stroke-width':'1.0',});
+		var rectSelection = d3.select(this).style('opacity','1.0').style('stroke','rgb(100,100,100)').style('stroke-width','1.0');
 		// var rectSelection = d3.select(this).style({opacity:'0.7'});
 	    });
 
