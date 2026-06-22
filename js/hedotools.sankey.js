@@ -129,24 +129,17 @@ hedotools.sankey = function() {
 	figcenter = width/2;
 	leftOffsetStatic = axeslabelmargin.left;
 
-	var hovergroup = figure.append("div").attr({
-	    "class": "hoverinfogroup",
-	    // "transform": "translate("+(x+hoverboxxoffset+axeslabelmargin.left)+","+(d3.min([d3.max([0,y-hoverboxheight/2-hoverboxyoffset]),height-hoverboxheight]))+")", 
-	})
-	    .style({
-		"position": "absolute",
-		"top": "100px",
-		"left": "100px",
-		"visibility": "hidden",
-	    });
+	var hovergroup = figure.append("div").attr("class", "hoverinfogroup")
+	    .style("position", "absolute")
+	    .style("top", "100px")
+	    .style("left", "100px")
+	    .style("visibility", "hidden");
 
 	function hidehover() {
 	    console.log("hiding hover");
 	    d3.selectAll("path").transition().duration(500).style("opacity","1.0");
 	    if (useTip) {
-		hovergroup.style({
-		    "visibility": "hidden",
-		});
+		hovergroup.style("visibility", "hidden");
 	    }
 	}
 
@@ -160,12 +153,12 @@ hedotools.sankey = function() {
 	    .attr("class","canvas")
 
 	// x scale, maps all the data to 
-	x = d3.scale.linear()
+	x = d3.scaleLinear()
 	    .domain([0,1])
 	    .range([5,width-10]);
 
 	// linear scale function
-	y =  d3.scale.linear()
+	y =  d3.scaleLinear()
 	    .domain([newlist.length,1])
 	    .range([height-20, 5]); 
 
@@ -204,8 +197,22 @@ hedotools.sankey = function() {
             .text(function(d,i) { return (d.newindex+1)+". "+d.name; });
 
 	// create an instance of the sankey to make paths
-	var sankey = d3.sankey();
-	path = sankey.link();
+	// horizontal sankey-style link path: this is the v3 d3.sankey().link()
+	// generator inlined. Nodes are positioned manually above, so we only need
+	// the path shape (a horizontal cubic Bezier), not the sankey layout.
+	path = function(d) {
+	    var x0 = d.source.x + d.source.dx,
+		x1 = d.target.x,
+		xi = d3.interpolateNumber(x0, x1),
+		x2 = xi(0.5),
+		x3 = xi(0.5),
+		y0 = d.source.y + d.sy + d.dy / 2,
+		y1 = d.target.y + d.ty + d.dy / 2;
+	    return "M" + x0 + "," + y0
+		+ "C" + x2 + "," + y0
+		+ " " + x3 + "," + y1
+		+ " " + x1 + "," + y1;
+	};
 
 	// create the sankey data thingy
 	sankeydata = Array(oldlist.length);
@@ -232,17 +239,17 @@ hedotools.sankey = function() {
 	    };
 	}
 
-	pathwidth = d3.scale.linear()
+	pathwidth = d3.scaleLinear()
 	    .domain(d3.extent(data.map(function(d) { return Math.abs(d.change); })))
 	    .range([2,13]);
 
 	pathselection = axes.selectAll("path.sankey").data(sankeydata)
 	    .enter()
 	    .append("path")
-            .attr({ "d": path,
-		    "fill": "none",
-		    "class": function(d,i) { return "r"+classColor(data[i].oldindex)+"-8"; },
-		    "stroke-width": function(d,i) { return pathwidth(Math.abs(data[i].change)); } })
+            .attr("d", path)
+		    .attr("fill", "none")
+		    .attr("class", function(d,i) { return "r"+classColor(data[i].oldindex)+"-8"; })
+		    .attr("stroke-width", function(d,i) { return pathwidth(Math.abs(data[i].change)); })
 	    .on("mouseover", function(d,i) { 
 		// console.log(i);
 		// console.log(data[i]);
@@ -281,12 +288,10 @@ hedotools.sankey = function() {
 		    // tip.show;
 		    // console.log(d);
 
-		    hovergroup.style({
-			"position": "absolute",
-			"top": y+"px",
-			"left": x+"px",
-			"visibility": "visible",
-		    });
+		    hovergroup.style("position", "absolute")
+			.style("top", y+"px")
+			.style("left", x+"px")
+			.style("visibility", "visible");
 
 		    hovergroup.selectAll("p,h3,button,br").remove();
 
@@ -438,7 +443,7 @@ hedotools.sankey = function() {
 		clearTimeout(popuptimer);
 		popuptimer = setTimeout(hidehover,timeout);
 		var rectSelection = d3.select(this)
-		    .style({ 'opacity':'1.0', }) 
+		    .style('opacity', '1.0')
 	    });
 
 	return hedotools.sankey;
@@ -493,12 +498,11 @@ hedotools.sankey = function() {
 	pathselection.data(sankeydata)
 	    .transition()
 	    .duration(3000)
-            .attr({ "d": path,
+            .attr("d", path)
 		    // don't update this
 		    // because the transition is applied by the css at the end
 		    // and it messes up the whole effect
-		    // "class": function(d,i) { return "r"+classColor(data[i].oldindex)+"-8"; },
-		    "stroke-width": function(d,i) { return pathwidth(Math.abs(data[i].change)); } });
+		    .attr("stroke-width", function(d,i) { return pathwidth(Math.abs(data[i].change)); });
 
 	return hedotools.sankey;
     };

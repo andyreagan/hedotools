@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>hedotools sankey browser test fixture</title>
+    <style>
+        body { margin: 8px; }
+        /* must be >= minwidth (450) or plot() bails with a message */
+        #sankey { width: 900px; }
+        /* link paths get class r{0..6}-8 from classColor; give them stroke */
+        .r0-8 { stroke: #d73027; } .r1-8 { stroke: #fc8d59; } .r2-8 { stroke: #fee08b; }
+        .r3-8 { stroke: #ffffbf; } .r4-8 { stroke: #d9ef8b; } .r5-8 { stroke: #91cf60; }
+        .r6-8 { stroke: #1a9850; }
+    </style>
+</head>
+<body>
+    <div id="sankey"></div>
+
+    <script src="../../node_modules/d3/build/d3.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../js/hedotools.init.v4.js"></script>
+    <script src="../../js/hedotools.sankey.js"></script>
+    <script src="../data/states-topo.js"></script>
+
+    <script type="text/javascript">
+        function hash(n) { var r = Math.sin(n) * 43758.5453; return r - Math.floor(r); }
+        var stateNames = window.usStatesTopo.objects.states.geometries.map(function (g) {
+            return g.properties.name;
+        });
+        // Two years of per-state happiness; different noise so ranks differ
+        // between old/new and the links cross (a real sankey shape).
+        var oldlist = stateNames.map(function (n, i) { return 5.7 + hash(i * 12.99) * 0.6; });
+        var newlist = stateNames.map(function (n, i) { return 5.7 + hash(i * 91.71) * 0.6; });
+
+        var s = hedotools.sankey();
+        s.setfigure(d3.select("#sankey"));
+        s.setdata(oldlist, newlist, stateNames);
+        s.plot();
+
+        window.__rendered = true;
+    </script>
+</body>
+</html>
