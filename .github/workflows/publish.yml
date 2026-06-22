@@ -27,6 +27,13 @@ jobs:
       # Trusted Publishing requires a recent npm (>= 11.5.1).
       - run: npm install -g npm@latest
 
-      # The v3.x line is the frozen D3 v3 source — no build or test step.
-      # Lint/unit/browser tests get added here in v4 (mirroring d3-shifterator).
+      - run: npm install
+
+      # Browser tests need a Chromium for Playwright.
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      # lint + unit + browser tests must pass before publishing.
+      - run: npm test
+
       - run: npm publish --access public
