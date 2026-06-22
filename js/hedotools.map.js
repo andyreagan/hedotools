@@ -8,7 +8,7 @@ hedotools.map = function() {
 	return hedotools.map;
     }
 
-    var classColor = d3.scale.quantize()
+    var classColor = d3.scaleQuantize()
         .range([0,1,2,3,4,5,6])
         .domain([50,1]);
 
@@ -51,79 +51,76 @@ hedotools.map = function() {
 	boxpadding = 5,
 	fullselboxwidth = selarray.length*boxpadding*2-boxpadding+initialpadding+d3.sum(selstringslen);
 
-	var legendscale = d3.scale.linear()
+	var legendscale = d3.scaleLinear()
             .domain([340,730])
             .range([0,1]);
 
 	function makeSelector() {
 
 	    canvas.append("text")
-		.attr({
-		    "x": (w-70-fullselboxwidth-56),
-		    "y": 54,
-		    "fill": "grey",
-		})
+		.attr("x", (w-70-fullselboxwidth-56))
+		.attr("y", 54)
+		.attr("fill", "grey")
 		.text("Selecting ");
 
 	    var selgroup = canvas.append("g")
-		.attr({"class": "selgroup",
-		       "transform": "translate("+(w-70-fullselboxwidth)+","+40+")",});
+		.attr("class", "selgroup")
+		.attr("transform", "translate("+(w-70-fullselboxwidth)+","+40+")");
 
 	    selgroup.append("rect")
-		.attr({"class": "selbox",
-		       "x": 0,
-		       "y": 0,
-		       "rx": 3,
-		       "ry": 3,
-		       "width": fullselboxwidth,
-		       "height": 19,
-		       "fill": "#F8F8F8",
-		       'stroke-width': '0.5',
-		       'stroke': 'rgb(0,0,0)'});
+		.attr("class", "selbox")
+		.attr("x", 0)
+		.attr("y", 0)
+		.attr("rx", 3)
+		.attr("ry", 3)
+		.attr("width", fullselboxwidth)
+		.attr("height", 19)
+		.attr("fill", "#F8F8F8")
+		.attr('stroke-width', '0.5')
+		.attr('stroke', 'rgb(0,0,0)');
 	    
 	    selgroup.selectAll("rect.colorclick")
     		.data(selarray)
     		.enter()
     		.append("rect")
-    		.attr({"class": function(d,i) { return "colorclick "+intStr[i]; },
-    		       "x": function(d,i) { if (i === 0) { return 0; }
-					    else { return d3.sum(selstringslen.slice(0,i))+i*boxpadding+(i-1)*boxpadding+initialpadding; } },
-    		       "y": 0,
-		       "rx": 3,
-		       "ry": 3,
-    		       "width": function(d,i) { if (i === 0) { return selstringslen[i]+initialpadding+boxpadding; } else { return selstringslen[i]+boxpadding*2; }},
-    		       "height": 19,
-    		       "fill": "#F8F8F8", //http://www.w3schools.com/html/html_colors.asp
-		       'stroke-width': '0.5',
-		       'stroke': 'rgb(0,0,0)'});
+    		.attr("class", function(d,i) { return "colorclick "+intStr[i]; })
+    		.attr("x", function(d,i) { if (i === 0) { return 0; }
+					    else { return d3.sum(selstringslen.slice(0,i))+i*boxpadding+(i-1)*boxpadding+initialpadding; } })
+    		.attr("y", 0)
+		.attr("rx", 3)
+		.attr("ry", 3)
+    		.attr("width", function(d,i) { if (i === 0) { return selstringslen[i]+initialpadding+boxpadding; } else { return selstringslen[i]+boxpadding*2; }})
+    		.attr("height", 19)
+    		.attr("fill", "#F8F8F8") //http://www.w3schools.com/html/html_colors.asp
+		.attr('stroke-width', '0.5')
+		.attr('stroke', 'rgb(0,0,0)');
 
 	    selgroup.selectAll("text")
     		.data(selstrings)
     		.enter()
     		.append("text")
-    		.attr({ "x": function(d,i) { 
+    		.attr("x", function(d,i) {
 		    // start at 2
 		    if (i==0) { return initialpadding; }
 		    // then use 2+width+10+width+10+width...
 		    // for default padding of 5 on L/R
-		    else { return d3.sum(selstringslen.slice(0,i))+initialpadding+i*boxpadding*2; } },
-    			"y": 14, 
-    			"class": function(d,i) { return "seltext "+intStr[i]; },
-		      })
+		    else { return d3.sum(selstringslen.slice(0,i))+initialpadding+i*boxpadding*2; } })
+    			.attr("y", 14)
+    			.attr("class", function(d,i) { return "seltext "+intStr[i]; })
     		.text(function(d,i) { return d; });
 
 	    selgroup.selectAll("rect.selclick")
     		.data(selarray)
     		.enter()
     		.append("rect")
-    		.attr({"class": "selrect",
-    		       "x": function(d,i) { if (i === 0) { return 0; }
-					    else { return d3.sum(selstringslen.slice(0,i))+i*boxpadding+(i-1)*boxpadding+initialpadding; } },
-    		       "y": 0,
-    		       "width": function(d,i) { if (i === 0) { return selstringslen[i]+initialpadding+boxpadding; } else { return selstringslen[i]+boxpadding*2; }},
-    		       "height": 19,
-    		       "fill": "white", //http://www.w3schools.com/html/html_colors.asp
-    		       "opacity": "0.0",})
+    		.attr("class", "selrect")
+    		.attr("x", function(d,i) { if (i === 0) { return 0; }
+					    else { return d3.sum(selstringslen.slice(0,i))+i*boxpadding+(i-1)*boxpadding+initialpadding; } })
+    		.attr("y", 0)
+    		.attr("width", function(d,i) { if (i === 0) { return selstringslen[i]+initialpadding+boxpadding; } else { return selstringslen[i]+boxpadding*2; }})
+    		.attr("height", 19)
+    		.attr("fill", "white") //http://www.w3schools.com/html/html_colors.asp
+    		.attr("opacity", "0.0")
     		.on("mousedown", function(d,i) {
 		    if (stateSelType !== d) {
 			stateSelType = d;
@@ -177,35 +174,34 @@ hedotools.map = function() {
 	    fulllegendboxwidth = legendarray.length*boxpadding*2-boxpadding+initialpadding+d3.sum(legendstringslen);
 
 	    var legendgroup = canvas.append("g")
-		.attr({"class": "legendgroup",
-		       "transform": "translate("+(w-50-fulllegendboxwidth)+","+(h-legendheight-legendheight-2)+")",});
+		.attr("class", "legendgroup")
+		.attr("transform", "translate("+(w-50-fulllegendboxwidth)+","+(h-legendheight-legendheight-2)+")");
 
 	    legendgroup.selectAll("rect.legendrect")
     		.data(legendarray)
     		.enter()
     		.append("rect")
-    		.attr({"class": function(d,i) { return "q"+i+"-8"; },
-    		       "x": function(d,i) { if (i === 0) { return 0; }
-					    else { return d3.sum(legendstringslen.slice(0,i))+i*boxpadding+(i-1)*boxpadding+initialpadding; } },
-    		       "y": 0,
+    		.attr("class", function(d,i) { return "q"+i+"-8"; })
+    		.attr("x", function(d,i) { if (i === 0) { return 0; }
+					    else { return d3.sum(legendstringslen.slice(0,i))+i*boxpadding+(i-1)*boxpadding+initialpadding; } })
+    		.attr("y", 0)
 		       // "rx": 3,
 		       // "ry": 3,
-    		       "width": function(d,i) { return legendstringslen[i]; },
-    		       "height": legendheight,
-		       'stroke-width': '1',
-		       'stroke': 'rgb(0,0,0)'});
+    		.attr("width", function(d,i) { return legendstringslen[i]; })
+    		.attr("height", legendheight)
+		.attr('stroke-width', '1')
+		.attr('stroke', 'rgb(0,0,0)');
 
 	    legendgroup.selectAll("text.legendtext")
 		.data(["less happy","happier"])
 		.enter()
 		.append("text")
-		.attr({"x": function(d,i) {
+		.attr("x", function(d,i) {
 		    if (i==0) { return 0; }
-		    else { return fulllegendboxwidth-d.width(textsize+"px arial"); } },
-    		       "y": legendheight+legendheight, 
-    		       "class": function(d,i) { return "legendtext"; },
-		       "font-size": textsize+"px",
-		      })
+		    else { return fulllegendboxwidth-d.width(textsize+"px arial"); } })
+    		.attr("y", legendheight+legendheight)
+    		.attr("class", function(d,i) { return "legendtext"; })
+		.attr("font-size", textsize+"px")
     		.text(function(d,i) { return d; });
 	}
 
@@ -214,13 +210,13 @@ hedotools.map = function() {
 	makeLegend((20+10*scaleFactor),(8+5*scaleFactor),(9+3*scaleFactor));
 
 	//Define map projection
-	var projection = d3.geo.albersUsa()
+	var projection = d3.geoAlbersUsa()
 	    .translate([w/2, h/2])
 	    .scale(w*1.3);
 	//.scale(1000);
 
 	//Define path generator
-	var path = d3.geo.path()
+	var path = d3.geoPath()
 	    .projection(projection);
 
 	var numColors = 20,
@@ -238,7 +234,7 @@ hedotools.map = function() {
 	// console.log(colorStrings);
 	
 	//Define quantize scale to sort data values into buckets of color
-	color = d3.scale.quantize()
+	color = d3.scaleQuantize()
 	//.range(["rgb(237,248,233)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"]);
             .range(colorStrings)
 	    .domain([
@@ -363,113 +359,101 @@ hedotools.map = function() {
 		hoverboxyoffset = -30;
 	    }
 	    
-	    var hovergroup = canvas.append("g").attr({
-		"class": "hoverinfogroup",
-		"transform": "translate("+(x+hoverboxxoffset)+","+(y-hoverboxheight/2-hoverboxyoffset)+")",});
+	    var hovergroup = canvas.append("g")
+		.attr("class", "hoverinfogroup")
+		.attr("transform", "translate("+(x+hoverboxxoffset)+","+(y-hoverboxheight/2-hoverboxyoffset)+")");
 
-	    var hoverbox = hovergroup.append("rect").attr({
-		"class": "hoverinfobox",
-		"x": 0,
-		"y": 0,
-		"width": hoverboxwidth,
-		"height": hoverboxheight,
-		"fill": "white",
-		"stroke": "black",
-	    });
+	    var hoverbox = hovergroup.append("rect")
+		.attr("class", "hoverinfobox")
+		.attr("x", 0)
+		.attr("y", 0)
+		.attr("width", hoverboxwidth)
+		.attr("height", hoverboxheight)
+		.attr("fill", "white")
+		.attr("stroke", "black");
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 10,
-		"y": 15,
-		"font-size": 15,
-	    })
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
+		.attr("y", 15)
+		.attr("font-size", 15)
 		.text(allData[i].name);
 
-	    hovergroup.append("line").attr({
-		"class": "hoverinfotext",
-		"x": 10,
-		"y": 15,
-		"font-size": 15,
-	    })
+	    hovergroup.append("line")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
+		.attr("y", 15)
+		.attr("font-size", 15)
 		.text(allData[i].name);
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 10,
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
 		//"y": 55,
-		"y": 38,
-		"font-size": 17,
-	    })
+		.attr("y", 38)
+		.attr("font-size", 17)
 		.text("Rank:"); // +"/51");
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 59,
-		"y": 55,
-		"font-size": 40,
-	    })
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 59)
+		.attr("y", 55)
+		.attr("font-size", 40)
 		.text(sortedStateList[i]); // +"/51");
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 105,
-		"y": 56,
-		"font-size": 20,
-	    })
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 105)
+		.attr("y", 56)
+		.attr("font-size", 20)
 		.text("out of 51");
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 10,
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
 		//"y": 73,
-		"y": 79,
-		"font-size": 15,
-	    })
+		.attr("y", 79)
+		.attr("font-size", 15)
 		.text(happsstring);
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 10,
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
 		//"y": 89,
-		"y": 97,
-		"font-size": 13,
-	    })
+		.attr("y", 97)
+		.attr("font-size", 13)
 		.text(wordsstring);
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 10,
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
 		//"y": 106,
-		"y": 114,
-		"font-size": 13,
-	    })
+		.attr("y", 114)
+		.attr("font-size", 13)
 		.text(wordsstring2);
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 10,
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
 		//"y": 106,
-		"y": 131,
-		"font-size": 13,
-	    })
+		.attr("y", 131)
+		.attr("font-size", 13)
 		.text("US Average Happiness: "+allData[51].avhapps.toFixed(2));
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 10,
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
 		//"y": 89,
-		"y": 97+51,
-		"font-size": 13,
-	    })
+		.attr("y", 97+51)
+		.attr("font-size", 13)
 		.text(USwordsstring);
 
-	    hovergroup.append("text").attr({
-		"class": "hoverinfotext",
-		"x": 10,
+	    hovergroup.append("text")
+		.attr("class", "hoverinfotext")
+		.attr("x", 10)
 		//"y": 106,
-		"y": 114+51,
-		"font-size": 13,
-	    })
+		.attr("y", 114+51)
+		.attr("font-size", 13)
 		.text(USwordsstring2);
 
 	    if (activeHover) {

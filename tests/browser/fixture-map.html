@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>hedotools map browser test fixture</title>
+    <style>
+        /* plot() reads the container's pixel width */
+        #map { width: 900px; }
+        /* 7-class sequential palette (ColorBrewer YlGnBu) for the q*-8 classes */
+        .q0-8 { fill: #ffffcc; }
+        .q1-8 { fill: #c7e9b4; }
+        .q2-8 { fill: #7fcdbb; }
+        .q3-8 { fill: #41b6c4; }
+        .q4-8 { fill: #1d91c0; }
+        .q5-8 { fill: #225ea8; }
+        .q6-8 { fill: #0c2c84; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script src="../../node_modules/d3/build/d3.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/topojson-client/dist/topojson-client.min.js"></script>
+    <script src="../../js/hedotools.init.v4.js"></script>
+    <script src="../../js/hedotools.map.js"></script>
+    <script src="../data/states-topo.js"></script>
+
+    <script type="text/javascript">
+        // Page-level globals the map module expects (normally set by maps.html).
+        var stateSelType = false;
+        var activeHover = true;
+
+        var geoJson = window.usStatesTopo;
+        // Names straight from the topojson, so data and features stay aligned.
+        var names = geoJson.objects.states.geometries.map(function (g) {
+            return g.properties.name;
+        });
+        var allStateNames = names.slice();
+        // 51 states + the US total at index 51. Real avhapps live behind the
+        // site; synthesize a deterministic spread so the choropleth has range.
+        var allData = names.map(function (n, i) {
+            return { name: n, avhapps: 5.85 + ((i * 7) % 30) / 100, freq: [1], rawFreq: [1] };
+        });
+        allData.push({ name: "United States", avhapps: 6.0, freq: [1], rawFreq: [1] });
+
+        // Accessors return the factory, so call them as separate statements.
+        var m = hedotools.map();
+        m.setfigure(d3.select("#map"));
+        m.setdata(geoJson);
+        m.plot();
+
+        window.__rendered = true;
+    </script>
+</body>
+</html>
