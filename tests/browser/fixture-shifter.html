@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>hedotools shifter adapter fixture</title>
+    <style>
+        #shift01 { width: 700px; }
+    </style>
+</head>
+<body>
+    <div id="shift01"></div>
+
+    <!-- D3 v4, then the d3-shifterator UMD (global `shifterator`, uses global d3),
+         then init (namespace) + the adapter that sets hedotools.shifter. -->
+    <script src="../../node_modules/d3/build/d3.min.js"></script>
+    <script src="../../node_modules/@andyreagan/d3-shifterator/dist/shifterator.js"></script>
+    <script src="../../js/hedotools.init.v4.js"></script>
+    <script src="../../js/hedotools.shifter.js"></script>
+
+    <script type="text/javascript">
+        // LabMT-scale synthetic data: a couple hundred words with happiness
+        // scores in [1,9] and two frequency vectors. (A handful of words is
+        // below the shift's internal word count and under-indexes; real usage
+        // passes the full ~10k-word LabMT vectors.)
+        function hash(n) { var r = Math.sin(n) * 43758.5453; return r - Math.floor(r); }
+        var N = 200, words = [], lens = [], refF = [], compF = [];
+        for (var i = 0; i < N; i++) {
+            words.push("word" + i);
+            lens.push(1 + hash(i * 12.9898) * 8);
+            refF.push(10 + Math.floor(hash(i * 7.1) * 500));
+            compF.push(10 + Math.floor(hash(i * 3.7) * 500));
+        }
+
+        // Exactly how the dashboard modules drive it: compute via shift(...),
+        // then setfigure(d3.select(...)) / setText / plot. hedotools.shifter is
+        // the @andyreagan/d3-shifterator instance (see js/hedotools.shifter.js).
+        hedotools.shifter.shift(refF, compF, lens, words);
+        hedotools.shifter
+            .setfigure(d3.select("#shift01"))
+            .setText(["hedotools shifter, via @andyreagan/d3-shifterator"])
+            .plot();
+
+        window.__rendered = true;
+    </script>
+</body>
+</html>
