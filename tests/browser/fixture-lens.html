@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>hedotools lens browser test fixture</title>
+    <style>
+        body { margin: 8px; }
+        #lens { width: 600px; }
+    </style>
+</head>
+<body>
+    <div id="lens"></div>
+
+    <script src="../../node_modules/d3/build/d3.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../js/hedotools.init.v4.js"></script>
+    <script src="../../js/hedotools.urllib.js"></script>
+    <script src="../../js/hedotools.lens.js"></script>
+
+    <script type="text/javascript">
+        // Deterministic bell-ish distribution of word-happiness scores in [1, 9].
+        function hash(n) { var r = Math.sin(n) * 43758.5453; return r - Math.floor(r); }
+        var lensData = [];
+        for (var i = 0; i < 3000; i++) {
+            var v = 1 + ((hash(i * 12.9898) + hash(i * 78.233) + hash(i * 37.719)) / 3) * 8;
+            lensData.push(v);
+        }
+
+        // The lens calls hedotools.lensoncall.test(extent) on brush end; that
+        // path recomputes the map + shift (heavy page wiring). Stub it to just
+        // capture the data-space extent so we can assert the brush event fired
+        // and the pixel->data inversion worked.
+        hedotools.lensoncall.test = function (extent) { window.__lastExtent = extent; };
+
+        var l = hedotools.lens();
+        l.setfigure(d3.select("#lens"));
+        l.setdata(lensData);
+        l.plot();
+
+        window.__rendered = true;
+    </script>
+</body>
+</html>

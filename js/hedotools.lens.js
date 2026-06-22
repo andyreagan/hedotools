@@ -93,19 +93,20 @@ hedotools.lens = function() {
 
 
 	    // create the x and y axis
-	    var x = d3.scale.linear()
+	    var x = d3.scaleLinear()
 	        .domain([1.00,9.00])
 		// .domain(d3.extent(lens))
 		.range([0,width]);
 	    
 	    // use d3.layout http://bl.ocks.org/mbostock/3048450
-	    var data = d3.layout.histogram()
-		.bins(x.ticks(65))
+	    var data = d3.histogram()
+		.domain(x.domain())
+		.thresholds(x.ticks(65))
                 (lens);
 
 	    // linear scale function
-	    var y =  d3.scale.linear()
-		.domain([0,d3.max(data,function(d) { return d.y; } )])
+	    var y =  d3.scaleLinear()
+		.domain([0,d3.max(data,function(d) { return d.length; } )])
 		.range([height, 0]); 
 
 	    // create the axes themselves
@@ -121,27 +122,23 @@ hedotools.lens = function() {
 		.attr("width", width)
 		.attr("height", height)
 		.attr("class", "bg")
-		.style({'stroke-width':'2','stroke':'rgb(0,0,0)'})
+		.style('stroke-width','2').style('stroke','rgb(0,0,0)')
 		.attr("fill", "#FFFFF0");
 
 	    // axes creation functions
 	    var create_xAxis = function() {
-		return d3.svg.axis()
-		    .scale(x)
-		    .ticks(9)
-		    .orient("bottom"); }
+		return d3.axisBottom(x)
+		    .ticks(9); }
 
 	    // axis creation function
 	    var create_yAxis = function() {
-		return d3.svg.axis()
-		    .ticks(3)
-		    .scale(y) //linear scale function
-		    .orient("left"); }
+		return d3.axisLeft(y)
+		    .ticks(3); }
 
 	    // draw the axes
 	    var yAxis = create_yAxis()
-		.innerTickSize(6)
-		.outerTickSize(0);
+		.tickSizeInner(6)
+		.tickSizeOuter(0);
 
 	    axes.append("g")
 		.attr("class", "top")
@@ -150,8 +147,8 @@ hedotools.lens = function() {
 		.call(yAxis);
 
 	    var xAxis = create_xAxis()
-		.innerTickSize(6)
-		.outerTickSize(0);
+		.tickSizeInner(6)
+		.tickSizeOuter(0);
 
 	    axes.append("g")
 		.attr("class", "x axis ")
@@ -159,7 +156,7 @@ hedotools.lens = function() {
 		.attr("transform", "translate(0," + (height) + ")")
 		.call(xAxis);
 
-	    d3.selectAll(".tick line").style({'stroke':'black'});
+	    d3.selectAll(".tick line").style('stroke','black');
 
 	    // create the clip boundary
 	    var clip = axes.append("svg:clipPath")
@@ -200,18 +197,18 @@ hedotools.lens = function() {
 		.enter()
 		.append("g")
 		.attr("class","distrect")
-		.attr("fill",function(d,i) { if (d.x > lensMean) {return "#D3D3D3";} else { return "#D3D3D3";}})
-		.attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+		.attr("fill",function(d,i) { if (d.x0 > lensMean) {return "#D3D3D3";} else { return "#D3D3D3";}})
+		.attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; });
 
 	    var mainrect = bar.append("rect")
 		.attr("x", 1)
-		.attr("width", x(data[0].dx+1)-2 )
-		.attr("height", function(d) { return height - y(d.y); });
+		.attr("width", x(data[0].x1 - data[0].x0 + 1)-2 )
+		.attr("height", function(d) { return height - y(d.length); });
 
-	    var line = d3.svg.line()
-		.x(function(d,i) { return x(d.x); })
-		.y(function(d) { return y(d.y); })
-		.interpolate("linear");
+	    var line = d3.line()
+		.x(function(d,i) { return x(d.x0); })
+		.y(function(d) { return y(d.length); })
+		.curve(d3.curveLinear);
 
 	    var mainline = axes.append("path")
 		.datum(data)
@@ -223,7 +220,7 @@ hedotools.lens = function() {
 
 	    //console.log(x(d3.min(lens)));
 
-	    var brushX = d3.scale.linear()
+	    var brushX = d3.scaleLinear()
 		.domain([1,9])
 		// .domain(d3.extent(lens))
 		.range([figwidth*.125,width+figwidth*.125]);
@@ -232,7 +229,9 @@ hedotools.lens = function() {
 
 	    function brushended() {
 		if (!d3.event.sourceEvent) return;
-		var extent0 = brush.extent(),
+		if (!d3.event.selection) return;
+		// selection is in pixels; invert through brushX to data space
+		var extent0 = d3.event.selection.map(brushX.invert),
 		extent1 = extent0; // should round it to bins
 
 		onredrawfunction();
@@ -247,26 +246,24 @@ hedotools.lens = function() {
 		} 
 
 		d3.select(this).transition()
-		    .call(brush.extent(lensExtent))
-		    .call(brush.event);
+		    .call(brush.move, lensExtent.map(brushX));
 
 		encoder.varval(lensExtent);
 	    }
 
-	    var brush = d3.svg.brush()
-		.x(brushX)
-		.extent(lensExtent)
-		.on("brushend",brushended);
+	    var brush = d3.brushX()
+		.extent([[brushX.range()[0], 0], [brushX.range()[1], height]])
+		.on("end",brushended);
 
 	    var gBrush = canvas.append("g")
 		.attr("class","lensbrush")
-		.call(brush)
-		.call(brush.event);
+		.call(brush);
+	    gBrush.call(brush.move, lensExtent.map(brushX));
 
 	    gBrush.selectAll("rect")
 		.attr("height",height)
 		.attr("y",0)
-		.style({'stroke-width':'2','stroke':'rgb(100,100,100)','opacity': 0.95})
+		.style('stroke-width','2').style('stroke','rgb(100,100,100)').style('opacity',0.95)
 		.attr("fill", "#FCFCFC");
 
 	    //console.log(lensExtent);
@@ -288,18 +285,17 @@ hedotools.lens = function() {
 		//xAxisHandle.call(xAxis);
 		canvas.select(".x.axis").call(xAxis);
 
-		canvas.selectAll(".distrect").attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+		canvas.selectAll(".distrect").attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; });
 		
 		// xlabel.attr("x",(leftOffsetStatic+width/2));
 
-		d3.selectAll(".tick line").style({'stroke':'black'});
+		d3.selectAll(".tick line").style('stroke','black');
 
 		// //brushX.range([figwidth*.125,width+figwidth*.125]);
 		brushX.range([leftOffsetStatic,leftOffsetStatic+width]);
-		brush.x(brushX);
+		brush.extent([[brushX.range()[0], 0], [brushX.range()[1], height]]);
 		d3.select(".lensbrush") //.transition()
-		    .call(brush.extent(lensExtent))
-		    .call(brush.event);
+		    .call(brush.move, lensExtent.map(brushX));
 		//brushing();
 		//brush.event();
 	    };
@@ -310,22 +306,21 @@ hedotools.lens = function() {
 	    //buttongroup.html('<button type="button" class="btn btn-default">Button</button><button type="button" class="btn btn-default">Button</button><div class="btn-group"><button id="btnGroupVerticalDrop1" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Dropdown<span class="caret"></span>        </button>     <ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop1">          <li><a href="#">Dropdown link</a></li>          <li><a href="#">Dropdown link</a></li>        </ul></div>      <button type="button" class="btn btn-default">Button</button>'
 
 	    figure.selectAll("div.btn-group-vertical").remove();
-	    var buttongroup = figure.append("div").attr({"class":"btn-group-vertical pull-right",})
+	    var buttongroup = figure.append("div").attr("class","btn-group-vertical pull-right")
 	    // var defaults = [[4,6],[3,7],[3,9],[1,7],[5,5]];
 	    var defaults = [[4,6],[3,7],[5,5]];
 	    // var defaultnames = ["Default","Wide","Sad","Happy","None"];
 	    var defaultnames = ["Default","Wide","None"];
 	    buttongroup.selectAll("button").data(defaults).enter()
 		.append("button")
-		.attr({"type":"button",
-                       "class": function(d,i) { return "btn btn-default btn-xs "+defaultnames[i]; },})
+		.attr("type","button")
+		.attr("class", function(d,i) { return "btn btn-default btn-xs "+defaultnames[i]; })
 		.html(function(d,i) { return defaultnames[i]; })
 		.on("click",function(d,i) { 
 		    figure.selectAll("button").attr("class","btn btn-default btn-xs"); 
 		    d3.select(this).attr("class","btn btn-primary btn-xs"); 
 		    d3.select(".lensbrush") //.transition()
-			.call(brush.extent(d))
-			.call(brush.event);
+			.call(brush.move, d.map(brushX));
 		});
 	    // initially check if any are matched
 	    console.log(lensExtent);
