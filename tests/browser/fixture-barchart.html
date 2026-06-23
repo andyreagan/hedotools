@@ -36,6 +36,13 @@
         bc._figheight(400);
         bc.plot();
 
+        // Capture the hover callback to verify the d3 v6 handler signature
+        // (event, d) and the index recovery test(d, d[0]). Looked up at call
+        // time, so stubbing after plot() is fine.
+        hedotools.barchartoncall.test = function (d, i) {
+            window.__lastBar = { label: d[2], value: d[3], i: i };
+        };
+
         window.__rendered = true;
     </script>
 </body>

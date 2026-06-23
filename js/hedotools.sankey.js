@@ -250,7 +250,7 @@ hedotools.sankey = function() {
 		    .attr("fill", "none")
 		    .attr("class", function(d,i) { return "r"+classColor(data[i].oldindex)+"-8"; })
 		    .attr("stroke-width", function(d,i) { return pathwidth(Math.abs(data[i].change)); })
-	    .on("mouseover", function(d,i) { 
+	    .on("mouseover", function(event,d) { var i = sankeydata.indexOf(d);
 		// console.log(i);
 		// console.log(data[i]);
 		// var rectSelection = d3.select(this)
@@ -276,8 +276,8 @@ hedotools.sankey = function() {
 		    var hoverboxyoffset = 0;
 		    var hoverboxxoffset = 0;
 
-		    var x = d3.mouse(thispath)[0];
-		    var y = d3.mouse(thispath)[1];
+		    var x = d3.pointer(event, thispath)[0];
+		    var y = d3.pointer(event, thispath)[1];
 
                     var hoverboxheightguess = 190;
 		    if (refcity.length > 0) {
@@ -428,7 +428,7 @@ hedotools.sankey = function() {
 		clearTimeout(popuptimer);
 		popuptimer = setTimeout(hidehover,3000);
 	    })
-	    .on("mouseout", function(d,i) { 
+	    .on("mouseout", function(event,d) {
 		var timeout = 500;
 		if (useTip) {
 		    // hovergroup.style({

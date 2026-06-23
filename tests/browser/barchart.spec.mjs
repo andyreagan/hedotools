@@ -42,3 +42,18 @@ test('labels are rank-numbered and sorted by happiness descending', async ({ pag
     expect(labels[0]).toBe('1. Hawaii');
     expect(labels[EXPECTED_STATES - 1]).toBe('5. Ohio');
 });
+
+// d3 v6 migration canary: .on() handlers are now (event, d), with the index
+// gone. The barchart hover recovers it as d[0] and calls
+// barchartoncall.test(d, d[0]). Hovering the top bar must fire with the right
+// datum + recovered index (the same pattern map/sankey handlers use).
+test('hovering a bar fires the v6 handler with the recovered index', async ({ page }) => {
+    expect(await page.evaluate(() => window.__lastBar)).toBeUndefined();
+
+    await page.locator('#barchart rect.staterect').first().hover();
+    await page.waitForFunction(() => window.__lastBar !== undefined);
+
+    const bar = await page.evaluate(() => window.__lastBar);
+    expect(bar.label).toBe('Hawaii'); // highest value -> rank 1 -> first rect
+    expect(bar.i).toBe(0);            // index recovered from d[0]
+});

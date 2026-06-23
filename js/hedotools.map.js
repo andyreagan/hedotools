@@ -121,7 +121,8 @@ hedotools.map = function() {
     		.attr("height", 19)
     		.attr("fill", "white") //http://www.w3schools.com/html/html_colors.asp
     		.attr("opacity", "0.0")
-    		.on("mousedown", function(d,i) {
+    		.on("mousedown", function(event,d) {
+		    var i = selarray.indexOf(d);
 		    if (stateSelType !== d) {
 			stateSelType = d;
 			activeHover = true;
@@ -275,7 +276,7 @@ hedotools.map = function() {
 	    .attr("stroke","black")
 	    .attr("stroke-width",".7");
 
-	function state_clicked(d,i) { 
+	function state_clicked(event,d) { var i = stateFeatures.indexOf(d);
 	    // next line verifies that the data and json line up
 	    // console.log(d.properties.name); console.log(allData[i].name);
 
@@ -331,7 +332,7 @@ hedotools.map = function() {
 	    // }
 	}
 
-	function state_hover(d,i) { 
+	function state_hover(event,d) { var i = stateFeatures.indexOf(d);
 	    var bbox = this.getBBox(); 
 	    var x = Math.floor(bbox.x + bbox.width/2.0);
 	    var y = Math.floor(bbox.y + bbox.height/2.0);
@@ -480,7 +481,7 @@ hedotools.map = function() {
 	    }
 	}
 
-	function state_unhover(d,i) { 
+	function state_unhover(event,d) {
 
 	    d3.select(".hoverinfogroup").remove();
 

@@ -99,7 +99,7 @@ hedotools.lens = function() {
 		.range([0,width]);
 	    
 	    // use d3.layout http://bl.ocks.org/mbostock/3048450
-	    var data = d3.histogram()
+	    var data = d3.bin()
 		.domain(x.domain())
 		.thresholds(x.ticks(65))
                 (lens);
@@ -227,11 +227,11 @@ hedotools.lens = function() {
 	    
 
 
-	    function brushended() {
-		if (!d3.event.sourceEvent) return;
-		if (!d3.event.selection) return;
+	    function brushended(event) {
+		if (!event.sourceEvent) return;
+		if (!event.selection) return;
 		// selection is in pixels; invert through brushX to data space
-		var extent0 = d3.event.selection.map(brushX.invert),
+		var extent0 = event.selection.map(brushX.invert),
 		extent1 = extent0; // should round it to bins
 
 		onredrawfunction();
@@ -316,7 +316,7 @@ hedotools.lens = function() {
 		.attr("type","button")
 		.attr("class", function(d,i) { return "btn btn-default btn-xs "+defaultnames[i]; })
 		.html(function(d,i) { return defaultnames[i]; })
-		.on("click",function(d,i) { 
+		.on("click",function(event,d) {
 		    figure.selectAll("button").attr("class","btn btn-default btn-xs"); 
 		    d3.select(this).attr("class","btn btn-primary btn-xs"); 
 		    d3.select(".lensbrush") //.transition()

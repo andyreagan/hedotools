@@ -264,11 +264,11 @@ hedotools.barchart = function() {
 	    .style('opacity','1.0').style('stroke-width','1.0').style('stroke','rgb(100,100,100)')
 	    .attr("height",function(d,i) { return 11; } )
 	    .attr("width",function(d,i) { if (d[3]>0) {return d3.max([x(d[3])-figcenter,0]);} else {return d3.max([figcenter-x(d[3]),0]); } } )
-	    .on('mouseover', function(d,i){
+	    .on('mouseover', function(event,d){
 		var rectSelection = d3.select(this).style('opacity','1.0').style('stroke','black').style('stroke-width','1.0');
-		hedotools.barchartoncall.test(d,i);
+		hedotools.barchartoncall.test(d,d[0]);
 	    })
-	    .on('mouseout', function(d){
+	    .on('mouseout', function(event,d){
 		var rectSelection = d3.select(this).style('opacity','1.0').style('stroke','rgb(100,100,100)').style('stroke-width','1.0');
 		// var rectSelection = d3.select(this).style({opacity:'0.7'});
 	    });
@@ -282,8 +282,8 @@ hedotools.barchart = function() {
 	    .style("text-anchor", function(d,i) { if (d[3]>0) { return "end";} else { return "start";}})
 	    .attr("y",function(d,i) { return y(i+1)+11; } )
             .text(function(d,i) { return (i+1)+". "+d[2]; })
-	    .on('mouseover', function(d,i){
-		hedotools.barchartoncall.test(d,i);
+	    .on('mouseover', function(event,d){
+		hedotools.barchartoncall.test(d,d[0]);
 	    });
 
 	// d3.select(window).on("resize.shiftplot",resizeshift);
