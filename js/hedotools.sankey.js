@@ -343,12 +343,12 @@ hedotools.sankey = function() {
 			console.log(compfile);
 			var refF;
 			var compF;
-			d3.text(reffile,function(text) {
+			d3.text(reffile).then(function(text) {
 			    refF = text.split(",");
 			    console.log(refF);
 			    if (!--csvLoadsRemaining) drawShift();
 			});
-			d3.text(compfile,function(text) {
+			d3.text(compfile).then(function(text) {
 			    compF = text.split(",");
 			    console.log(compF);
 			    if (!--csvLoadsRemaining) drawShift();
