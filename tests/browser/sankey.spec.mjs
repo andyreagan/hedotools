@@ -43,3 +43,18 @@ test('inlined link generator produces real cubic-bezier paths', async ({ page })
         expect(d).not.toContain('NaN');
     }
 });
+
+// d3 v6 migration canary for the dashboard interaction: the link .on("mouseover",
+// (event, d)) handler recovers its index via sankeydata.indexOf(d), then calls
+// hedotools.sankeyoncall.test(i, data), which drives a shift into #shift01.
+// Hovering a link must render that shift — proving index recovery + the whole
+// hover->shift path work under v6.
+test('hovering a link drives the shift', async ({ page }) => {
+    await expect(page.locator('#shift01 svg#shiftsvg')).toHaveCount(0);
+
+    // hover a link near the middle of the rank range (avoids edge overlaps)
+    await page.locator('#sankey path').nth(25).hover();
+
+    await expect(page.locator('#shift01 svg#shiftsvg')).toHaveCount(1);
+    expect(await page.locator('#shift01 rect.shiftrect').count()).toBeGreaterThan(20);
+});
