@@ -16,20 +16,15 @@
     <script src="../../node_modules/@andyreagan/d3-shifterator/dist/shifterator.js"></script>
     <script src="../../js/hedotools.init.v4.js"></script>
     <script src="../../js/hedotools.shifter.js"></script>
+    <script src="_fixture-data.js"></script>
 
     <script type="text/javascript">
-        // LabMT-scale synthetic data: a couple hundred words with happiness
-        // scores in [1,9] and two frequency vectors. (A handful of words is
-        // below the shift's internal word count and under-indexes; real usage
-        // passes the full ~10k-word LabMT vectors.)
-        function hash(n) { var r = Math.sin(n) * 43758.5453; return r - Math.floor(r); }
-        var N = 200, words = [], lens = [], refF = [], compF = [];
-        for (var i = 0; i < N; i++) {
-            words.push("word" + i);
-            lens.push(1 + hash(i * 12.9898) * 8);
-            refF.push(10 + Math.floor(hash(i * 7.1) * 500));
-            compF.push(10 + Math.floor(hash(i * 3.7) * 500));
-        }
+        // LabMT-scale synthetic data (200 words). A handful of words would be
+        // below the shift's internal word count and under-index; real usage
+        // passes the full ~10k-word LabMT vectors.
+        var N = 200;
+        var words = hedoTest.words(N), lens = hedoTest.lens(N);
+        var refF = hedoTest.freq(7, N), compF = hedoTest.freq(3, N);
 
         // Exactly how the dashboard modules drive it: compute via shift(...),
         // then setfigure(d3.select(...)) / setText / plot. hedotools.shifter is

@@ -26,32 +26,24 @@
     <script src="../../js/hedotools.shifter.js"></script>
     <script src="../../js/hedotools.sankey.js"></script>
     <script src="../data/states-topo.js"></script>
+    <script src="_fixture-data.js"></script>
 
     <script type="text/javascript">
-        function hash(n) { var r = Math.sin(n) * 43758.5453; return r - Math.floor(r); }
         var stateNames = window.usStatesTopo.objects.states.geometries.map(function (g) {
             return g.properties.name;
         });
         // Two years of per-state happiness; different noise so ranks differ
         // between old/new and the links cross (a real sankey shape).
-        var oldlist = stateNames.map(function (n, i) { return 5.7 + hash(i * 12.99) * 0.6; });
-        var newlist = stateNames.map(function (n, i) { return 5.7 + hash(i * 91.71) * 0.6; });
+        var oldlist = stateNames.map(function (n, i) { return 5.7 + hedoTest.hash(i * 12.99) * 0.6; });
+        var newlist = stateNames.map(function (n, i) { return 5.7 + hedoTest.hash(i * 91.71) * 0.6; });
 
         // Globals the link-hover handler (hedotools.sankeyoncall.test) reads:
         // per-state word-frequency vectors for the two years, plus lens/words.
         // LabMT-scale so .shift() doesn't under-index.
-        var NWORDS = 200, words = [], lens = [];
-        for (var k = 0; k < NWORDS; k++) {
-            words.push("word" + k);
-            lens.push(1 + hash(k * 12.9898) * 8);
-        }
-        function freqVec(seed) {
-            var f = [];
-            for (var k = 0; k < NWORDS; k++) f.push(10 + Math.floor(hash((seed + 1) * 3.1 + k * 7.7) * 500));
-            return f;
-        }
-        var allDataOld = stateNames.map(function (n, i) { return { name: n, freq: freqVec(i) }; });
-        var allData = stateNames.map(function (n, i) { return { name: n, freq: freqVec(i + 1000) }; });
+        var NWORDS = 200;
+        var words = hedoTest.words(NWORDS), lens = hedoTest.lens(NWORDS);
+        var allDataOld = stateNames.map(function (n, i) { return { name: n, freq: hedoTest.freq(i, NWORDS) }; });
+        var allData = stateNames.map(function (n, i) { return { name: n, freq: hedoTest.freq(i + 1000, NWORDS) }; });
 
         var s = hedotools.sankey; // invoked singleton
         s.setfigure(d3.select("#sankey"));

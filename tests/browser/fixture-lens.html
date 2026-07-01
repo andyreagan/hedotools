@@ -16,11 +16,12 @@
     <script src="../../js/hedotools.init.v4.js"></script>
     <script src="../../js/hedotools.urllib.js"></script>
     <script src="../../js/hedotools.lens.js"></script>
+    <script src="_fixture-data.js"></script>
 
     <script type="text/javascript">
-        // Deterministic bell-ish distribution of word-happiness scores in [1, 9].
-        function hash(n) { var r = Math.sin(n) * 43758.5453; return r - Math.floor(r); }
-        var lensData = [];
+        // Deterministic bell-ish distribution of word-happiness scores in [1, 9]
+        // (three hashes averaged -> roughly normal), specific to the histogram.
+        var hash = hedoTest.hash, lensData = [];
         for (var i = 0; i < 3000; i++) {
             var v = 1 + ((hash(i * 12.9898) + hash(i * 78.233) + hash(i * 37.719)) / 3) * 8;
             lensData.push(v);
