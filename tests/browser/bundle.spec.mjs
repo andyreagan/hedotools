@@ -39,13 +39,17 @@ test('the single-file bundle populates the whole hedotools namespace', async ({ 
         map: typeof window.hedotools.map,
         lens: typeof window.hedotools.lens,
         sankey: typeof window.hedotools.sankey,
+        computeHapps: typeof window.hedotools.computeHapps,
     }));
     expect(types.hedotools).toBe('object');
-    expect(types.shifter).toBe('object');   // the wired d3-shifterator instance
-    expect(types.barchart).toBe('function'); // factories
-    expect(types.map).toBe('function');
-    expect(types.lens).toBe('function');
-    expect(types.sankey).toBe('function');
+    // every module is an invoked singleton (not a bare factory), consistent
+    // with hedotools.shifter and how hedonometer's pages consume them.
+    expect(types.shifter).toBe('object');
+    expect(types.barchart).toBe('object');
+    expect(types.map).toBe('object');
+    expect(types.lens).toBe('object');
+    expect(types.sankey).toBe('object');
+    expect(types.computeHapps).toBe('object'); // lens' onredraw path calls .go()
 });
 
 test('hedotools.shifter exposes every method hedonometer calls', async ({ page }) => {
@@ -58,16 +62,16 @@ test('hedotools.shifter exposes every method hedonometer calls', async ({ page }
 
 test('hedotools.sankey exposes every method hedonometer calls', async ({ page }) => {
     const missing = await page.evaluate((api) => {
-        const s = window.hedotools.sankey();
+        const s = window.hedotools.sankey; // singleton
         return api.filter((m) => typeof s[m] !== 'function');
     }, SANKEY_API);
     expect(missing).toEqual([]);
 });
 
-test('hedotools.map / lens / barchart instantiate with plot()', async ({ page }) => {
+test('hedotools.map / lens / barchart expose setfigure/setdata/plot', async ({ page }) => {
     const ok = await page.evaluate(() => {
         const has = (o, m) => typeof o[m] === 'function';
-        const m = window.hedotools.map(), l = window.hedotools.lens(), b = window.hedotools.barchart();
+        const m = window.hedotools.map, l = window.hedotools.lens, b = window.hedotools.barchart;
         return has(m, 'setfigure') && has(m, 'setdata') && has(m, 'plot')
             && has(l, 'setfigure') && has(l, 'setdata') && has(l, 'plot')
             && has(b, 'setfigure') && has(b, 'setdata') && has(b, 'plot');

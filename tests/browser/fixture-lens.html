@@ -32,7 +32,7 @@
         // and the pixel->data inversion worked.
         hedotools.lensoncall.test = function (extent) { window.__lastExtent = extent; };
 
-        var l = hedotools.lens();
+        var l = hedotools.lens; // invoked singleton
         l.setfigure(d3.select("#lens"));
         l.setdata(lensData);
         l.plot();

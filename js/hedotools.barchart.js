@@ -24,6 +24,16 @@ hedotools.barchartoncall = function() {
     return opublic;
 }();
 
+// mousedown ("click-to-open") hook: an empty stub by default; the host page
+// overrides hedotools.barchartonclick.test to open the linked shift/modal.
+hedotools.barchartonclick = function() {
+    var test = function(event,d) {
+    }
+    var opublic = { test: test,
+		  };
+    return opublic;
+}();
+
 // make the plot
 hedotools.barchart = function() {
     var figure;
@@ -271,6 +281,9 @@ hedotools.barchart = function() {
 	    .on('mouseout', function(event,d){
 		var rectSelection = d3.select(this).style('opacity','1.0').style('stroke','rgb(100,100,100)').style('stroke-width','1.0');
 		// var rectSelection = d3.select(this).style({opacity:'0.7'});
+	    })
+	    .on('mousedown', function(event,d){
+		hedotools.barchartonclick.test(d,d[0]);
 	    });
 
 	axes.selectAll("text.statetext")
@@ -284,6 +297,9 @@ hedotools.barchart = function() {
             .text(function(d,i) { return (i+1)+". "+d[2]; })
 	    .on('mouseover', function(event,d){
 		hedotools.barchartoncall.test(d,d[0]);
+	    })
+	    .on('mousedown', function(event,d){
+		hedotools.barchartonclick.test(d,d[0]);
 	    });
 
 	// d3.select(window).on("resize.shiftplot",resizeshift);
@@ -334,7 +350,7 @@ hedotools.barchart = function() {
 		    plot: plot, };
 
     return opublic;
-};
+}();
 
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@andyreagan/hedotools",
-  "version": "7.1.0",
+  "version": "7.2.0",
   "description": "A collection of D3.js tools in use at hedonometer.org: word shifts (via @andyreagan/d3-shifterator), choropleth maps, sankey diagrams, a frequency lens, and bar charts. Version tracks the supported D3 major version (7.x = D3 v7).",
   "author": "Andy Reagan",
   "license": "BSD-2-Clause",

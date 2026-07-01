@@ -53,7 +53,7 @@
         var allDataOld = stateNames.map(function (n, i) { return { name: n, freq: freqVec(i) }; });
         var allData = stateNames.map(function (n, i) { return { name: n, freq: freqVec(i + 1000) }; });
 
-        var s = hedotools.sankey();
+        var s = hedotools.sankey; // invoked singleton
         s.setfigure(d3.select("#sankey"));
         s.setdata(oldlist, newlist, stateNames);
         s.plot();

@@ -30,7 +30,7 @@
 
         // Accessors return the factory (not the instance), so call them as
         // separate statements rather than chaining.
-        var bc = hedotools.barchart();
+        var bc = hedotools.barchart; // invoked singleton
         bc.setfigure(d3.select("#barchart"));
         bc.setdata(data, geodata);
         bc._figheight(400);
@@ -41,6 +41,10 @@
         // time, so stubbing after plot() is fine.
         hedotools.barchartoncall.test = function (d, i) {
             window.__lastBar = { label: d[2], value: d[3], i: i };
+        };
+        // Same for the mousedown ("click-to-open") hook.
+        hedotools.barchartonclick.test = function (d, i) {
+            window.__clickedBar = { label: d[2], value: d[3], i: i };
         };
 
         window.__rendered = true;

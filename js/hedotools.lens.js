@@ -345,4 +345,4 @@ hedotools.lens = function() {
 		  };
 
     return opublic;
-};
+}();

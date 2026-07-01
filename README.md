@@ -90,49 +90,59 @@ hedotools.shifter
 See the [d3-shifterator README](https://github.com/andyreagan/d3-shifterator)
 for the full shifter API and a [live Observable example](https://observablehq.com/@andyreagan/d3-shifterator-v4).
 
+Each module is an **invoked singleton** on the `hedotools` namespace (like
+`hedotools.shifter`) — use it directly, don't call it as a factory:
+
 ### barchart
 
 ```js
-var bc = hedotools.barchart();
-bc.setfigure(d3.select("#barchart"));
-bc.setdata(data, geodata); // data: per-state values; geodata: geojson w/ properties.name
-bc._figheight(400);
-bc.plot();
+hedotools.barchart.setfigure(d3.select("#barchart"));
+hedotools.barchart.setdata(data, geodata); // data: per-state values; geodata: geojson w/ properties.name
+hedotools.barchart._figheight(400);
+hedotools.barchart.plot();
 ```
 
 ### map
 
 ```js
-var m = hedotools.map();
-m.setfigure(d3.select("#map"));
-m.setdata(geoJson);        // us-states topojson
-m.plot();
+hedotools.map.setfigure(d3.select("#map"));
+hedotools.map.setdata(geoJson);        // us-states topojson
+hedotools.map.plot();
 ```
 
 ### lens
 
 ```js
-var l = hedotools.lens();
-l.setfigure(d3.select("#lens"));
-l.setdata(lens);           // array of word-happiness scores
-l.plot();
+hedotools.lens.setfigure(d3.select("#lens"));
+hedotools.lens.setdata(lens);          // array of word-happiness scores
+hedotools.lens.plot();
 ```
+
+The lens uses `hedotools.urllib` (bundled) to persist its range in the URL, and
+its brush-move callback recomputes state happiness via `hedotools.computeHapps`
+(also bundled) before redrawing the map/shift. Load the full bundle, or the
+individual sources with `urllib` and `computeHapps` before `lens`.
 
 ### sankey
 
 ```js
-var s = hedotools.sankey();
-s.setfigure(d3.select("#sankey"));
-s.setdata(oldlist, newlist, stateNames); // two happiness vectors + names
-s.plot();
+hedotools.sankey.setfigure(d3.select("#sankey"));
+hedotools.sankey.setdata(oldlist, newlist, stateNames); // two happiness vectors + names
+hedotools.sankey.plot();
 ```
 
-> **Note:** unlike the shifter, the four dashboard modules were written for the
+`hedotools.nonsankey.js` is an alternate implementation (the cities-page
+variant) that **also** defines `hedotools.sankey` — load it *instead of*
+`hedotools.sankey.js`, never alongside. It ships as a loose file and is not in
+the default bundle.
+
+> **Note:** unlike the shifter, the dashboard modules were written for the
 > hedonometer.org pages and read page-level globals (e.g. `allData`, `lens`,
 > `words`, `shiftRef`/`shiftComp`, and the url encoders) in their interaction
 > handlers, where hovering/clicking drives a linked shift. They render
-> standalone from `setdata(...).plot()`, but the hover→shift wiring expects
-> those globals to be present. See `tests/browser/` for working fixtures.
+> standalone from `setdata(...).plot()`, but the hover→shift wiring (and
+> barchart's mousedown click-to-open) expects those globals to be present. See
+> `tests/browser/` for working fixtures.
 
 ## Developing
 

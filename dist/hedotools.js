@@ -253,6 +253,24 @@ hedotools.urllib = {
 
 
 
+hedotools.computeHapps = function() {
+    var go = function () {
+	for (var j=0; j<52; j++) {
+	    // compute total frequency
+	    var N = 0.0;
+	    for (var i=0; i<allData[j].freq.length; i++) {
+		N += parseFloat(allData[j].freq[i]);
+	    }
+	    var happs = 0.0;
+	    for (var i=0; i<allData[j].freq.length; i++) {
+		happs += parseFloat(allData[j].freq[i])*parseFloat(lens[i]);
+	    }
+	    allData[j].avhapps = happs/N;
+	}
+    }
+    var opublic = { go: go, };
+    return opublic;
+}();
 hedotools.barchartoncall = function() {
     var test = function(d,i) {
 	// console.log(i);
@@ -273,6 +291,16 @@ hedotools.barchartoncall = function() {
 	    var happysad = hedotools.shifter._compH() > hedotools.shifter._refH() ? "happier" : "less happy";
 	    hedotools.shifter.setfigure(d3.select('#shift01')).setText(["Why "+allData[shiftComp].name+" is "+happysad+" than "+allData[shiftRef].name+":"]).plot();
 	}
+    }
+    var opublic = { test: test,
+		  };
+    return opublic;
+}();
+
+// mousedown ("click-to-open") hook: an empty stub by default; the host page
+// overrides hedotools.barchartonclick.test to open the linked shift/modal.
+hedotools.barchartonclick = function() {
+    var test = function(event,d) {
     }
     var opublic = { test: test,
 		  };
@@ -526,6 +554,9 @@ hedotools.barchart = function() {
 	    .on('mouseout', function(event,d){
 		var rectSelection = d3.select(this).style('opacity','1.0').style('stroke','rgb(100,100,100)').style('stroke-width','1.0');
 		// var rectSelection = d3.select(this).style({opacity:'0.7'});
+	    })
+	    .on('mousedown', function(event,d){
+		hedotools.barchartonclick.test(d,d[0]);
 	    });
 
 	axes.selectAll("text.statetext")
@@ -539,6 +570,9 @@ hedotools.barchart = function() {
             .text(function(d,i) { return (i+1)+". "+d[2]; })
 	    .on('mouseover', function(event,d){
 		hedotools.barchartoncall.test(d,d[0]);
+	    })
+	    .on('mousedown', function(event,d){
+		hedotools.barchartonclick.test(d,d[0]);
 	    });
 
 	// d3.select(window).on("resize.shiftplot",resizeshift);
@@ -589,7 +623,7 @@ hedotools.barchart = function() {
 		    plot: plot, };
 
     return opublic;
-};
+}();
 
 
 
@@ -946,7 +980,7 @@ hedotools.lens = function() {
 		  };
 
     return opublic;
-};
+}();
 hedotools.map = function() {
 
     var figure;
@@ -1501,7 +1535,7 @@ hedotools.map = function() {
 
     return opublic;
 
-};
+}();
 
 
 
@@ -2054,7 +2088,7 @@ hedotools.sankey = function() {
     };
 
     return opublic;
-};
+}();
 
 
 

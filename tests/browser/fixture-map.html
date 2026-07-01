@@ -68,7 +68,7 @@
         allData.push({ name: "United States", avhapps: 6.0, freq: freqVec(99), rawFreq: freqVec(99) });
 
         // Accessors return the factory, so call them as separate statements.
-        var m = hedotools.map();
+        var m = hedotools.map; // invoked singleton
         m.setfigure(d3.select("#map"));
         m.setdata(geoJson);
         m.plot();

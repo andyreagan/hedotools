@@ -22,9 +22,13 @@ here="$(cd "$(dirname "$0")" && pwd)"
 cd "$here"
 mkdir -p dist
 
+# hedotools.nonsankey.js is deliberately NOT bundled: it is an alternate that
+# also defines `hedotools.sankey` (the cities-page variant), so it is loaded
+# INSTEAD of hedotools.sankey.js, never alongside it. It ships as a loose file.
 cat \
   js/hedotools.init.v4.js \
   js/hedotools.urllib.js \
+  js/hedotools.computeHapps.js \
   js/hedotools.barchart.js \
   js/hedotools.lens.js \
   js/hedotools.map.js \

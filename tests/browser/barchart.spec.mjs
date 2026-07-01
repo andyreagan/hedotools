@@ -57,3 +57,17 @@ test('hovering a bar fires the v6 handler with the recovered index', async ({ pa
     expect(bar.label).toBe('Hawaii'); // highest value -> rank 1 -> first rect
     expect(bar.i).toBe(0);            // index recovered from d[0]
 });
+
+// Regression: the barchart's mousedown ("click-to-open") handlers were dropped
+// in an earlier port. They call hedotools.barchartonclick.test(d, d[0]) on both
+// the rects and the labels, so a click drives the linked shift on the host page.
+test('mousedown on a bar fires the click-to-open handler', async ({ page }) => {
+    expect(await page.evaluate(() => window.__clickedBar)).toBeUndefined();
+
+    await page.locator('#barchart rect.staterect').first().dispatchEvent('mousedown');
+    await page.waitForFunction(() => window.__clickedBar !== undefined);
+
+    const bar = await page.evaluate(() => window.__clickedBar);
+    expect(bar.label).toBe('Hawaii');
+    expect(bar.i).toBe(0);
+});
