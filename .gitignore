@@ -2,9 +2,8 @@
 # this is just huge
 Mathjax*
 
-# v4: tooling + build artifacts
+# tooling + build artifacts (dist/ IS committed — it's the published bundle)
 node_modules/
 /test-results/
 /playwright-report/
-js/hedotools.v4.js
 *.tgz

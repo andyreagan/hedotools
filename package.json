@@ -1,15 +1,20 @@
 {
   "name": "@andyreagan/hedotools",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "A collection of D3.js tools in use at hedonometer.org: word shifts (via @andyreagan/d3-shifterator), choropleth maps, sankey diagrams, a frequency lens, and bar charts. Version tracks the supported D3 major version (7.x = D3 v7).",
   "author": "Andy Reagan",
   "license": "BSD-2-Clause",
+  "main": "dist/hedotools.js",
+  "unpkg": "dist/hedotools-bundle.js",
+  "browser": "dist/hedotools.js",
   "scripts": {
     "lint": "eslint js",
     "build": "bash bundle.sh",
     "test:unit": "vitest run --passWithNoTests",
+    "pretest:browser": "npm run build",
     "test:browser": "playwright test",
-    "test": "npm run lint && npm run test:unit && npm run test:browser"
+    "test": "npm run lint && npm run test:unit && npm run test:browser",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -20,6 +25,7 @@
     "url": "https://github.com/andyreagan/hedotools/issues"
   },
   "files": [
+    "dist",
     "js",
     "css",
     "fonts",

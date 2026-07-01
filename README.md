@@ -33,8 +33,28 @@ npm install @andyreagan/hedotools
 ```
 
 The modules are browser scripts that attach to a global `hedotools` namespace.
-Load D3, then the d3-shifterator UMD bundle (it defines the global
-`shifterator`), then the hedotools sources — in that order:
+
+### Single-file bundle (recommended)
+
+`dist/hedotools-bundle.js` inlines `@andyreagan/d3-shifterator`, so you only
+need global `d3` (plus jQuery, and `topojson` for the map). One script tag
+gives you the whole `hedotools.*` namespace:
+
+```html
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://unpkg.com/topojson-client@3"></script>
+<script src="node_modules/@andyreagan/hedotools/dist/hedotools-bundle.js"></script>
+```
+
+`dist/hedotools.js` is the same but *without* d3-shifterator inlined — use it
+if you already load the `shifterator` global yourself (load it before this
+file). Both are produced by `bundle.sh` / `npm run build`.
+
+### Individual sources
+
+Or load the raw sources in order — D3, then the d3-shifterator UMD (it defines
+the global `shifterator`), then the hedotools sources:
 
 ```html
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -47,9 +67,6 @@ Load D3, then the d3-shifterator UMD bundle (it defines the global
 <script src="node_modules/@andyreagan/hedotools/js/hedotools.lens.js"></script>
 <script src="node_modules/@andyreagan/hedotools/js/hedotools.sankey.js"></script>
 ```
-
-`bundle.sh` concatenates these into a single `js/hedotools.v4.js` for
-deployment; the load order above is the canonical one.
 
 `hedotools.map` and `hedotools.sankey` also use
 [`topojson-client`](https://www.npmjs.com/package/topojson-client) (global
@@ -124,7 +141,7 @@ npm install
 npm test          # lint + unit + Playwright browser tests
 npm run lint
 npm run test:browser
-npm run build     # bundle.sh -> js/hedotools.v4.js
+npm run build     # bundle.sh -> dist/hedotools.js + dist/hedotools-bundle.js
 ```
 
 Browser tests live in `tests/browser/`: each module loads as a `<script>` with

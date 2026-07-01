@@ -1,22 +1,42 @@
 #!/usr/bin/env bash
-# Concatenate the D3 v4 sources into a single browser bundle for hedonometer.org.
-# Order matters: init.v4 defines the `hedotools` namespace + helpers first, and
-# the dashboard modules (barchart/lens/map/sankey) depend on hedotools.shifter.
+# Build the distributable browser bundles into dist/.
 #
-# NOTE: hedotools.shifter.js only adapts the @andyreagan/d3-shifterator package
-# into hedotools.shifter — the page must load D3 v4 and the d3-shifterator UMD
-# bundle (global `shifterator`) BEFORE this bundle.
+# Two artifacts, mirroring @andyreagan/d3-shifterator's shifterator.js /
+# shifterator-bundle.js split:
+#
+#   dist/hedotools.js         the concatenated hedotools sources. Attaches
+#                             everything to a global `hedotools`. Expects global
+#                             `d3` (v7) AND `shifterator` (from
+#                             @andyreagan/d3-shifterator) to be loaded first.
+#
+#   dist/hedotools-bundle.js  the above with the d3-shifterator UMD inlined, so
+#                             a consumer needs only global `d3` (plus jQuery, and
+#                             `topojson` for the map). This is the single-file
+#                             drop-in for a page that just wants `hedotools.*`.
+#
+# Source order matters: init.v4 defines the `hedotools` namespace + helpers,
+# the dashboard modules depend on it, and hedotools.shifter.js (the adapter)
+# needs the global `shifterator` at load time.
 set -euo pipefail
-cd "$(dirname "$0")/js"
+here="$(cd "$(dirname "$0")" && pwd)"
+cd "$here"
+mkdir -p dist
 
 cat \
-  hedotools.init.v4.js \
-  hedotools.urllib.js \
-  hedotools.barchart.js \
-  hedotools.lens.js \
-  hedotools.map.js \
-  hedotools.sankey.js \
-  hedotools.shifter.js \
-  > hedotools.v4.js
+  js/hedotools.init.v4.js \
+  js/hedotools.urllib.js \
+  js/hedotools.barchart.js \
+  js/hedotools.lens.js \
+  js/hedotools.map.js \
+  js/hedotools.sankey.js \
+  js/hedotools.shifter.js \
+  > dist/hedotools.js
+echo "built dist/hedotools.js"
 
-echo "built js/hedotools.v4.js"
+shifter="node_modules/@andyreagan/d3-shifterator/dist/shifterator.js"
+if [ -f "$shifter" ]; then
+  cat "$shifter" dist/hedotools.js > dist/hedotools-bundle.js
+  echo "built dist/hedotools-bundle.js"
+else
+  echo "WARNING: $shifter not found (run npm install) — skipped dist/hedotools-bundle.js" >&2
+fi
