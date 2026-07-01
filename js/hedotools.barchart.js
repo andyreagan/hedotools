@@ -301,42 +301,6 @@ hedotools.barchart = function() {
 	    .on('mousedown', function(event,d){
 		hedotools.barchartonclick.test(d,d[0]);
 	    });
-
-	// d3.select(window).on("resize.shiftplot",resizeshift);
-	
-	// function resizeshift() {
-	// 	figwidth = parseInt(d3.select("#shift01").style('width')) - margin.left - margin.right,
-	// 	width = .775*figwidth
-	// 	figcenter = width/2;
-
-	// 	canvas.attr("width",figwidth);
-
-	// 	x.range([(sortedWords[0].length+3)*9, width-(sortedWords[0].length+3)*9]);
-	// 	topScale.range([width*.1,width*.9]);
-
-	// 	bgrect.attr("width",width);
-	// 	//axes.attr("transform", "translate(" + (0.125 * figwidth) + "," +
-	// 	//      ((1 - 0.125 - 0.775) * figheight) + ")");
-	
-	// 	// mainline.attr("d",line);
-
-	// 	// fix the x axis
-	// 	canvas.select(".x.axis").call(xAxis);
-
-	// 	clip.attr("width",width);
-
-	// 	// get the x label
-	// 	xlabel.attr("x",(leftOffsetStatic+width/2));
-
-	// 	// the andy reagan credit
-	// 	credit.attr("x",width-7);
-
-	// 	// line separating summary
-	// 	sepline.attr("x2",width);
-
-	// 	// all of the lower shift text
-	// 	axes.selectAll("text.shifttext").attr("x",function(d,i) { if (d>0) {return x(d)+2;} else {return x(d)-2; } } );
-	// }
     };
 
     var opublic = { setfigure: setfigure,

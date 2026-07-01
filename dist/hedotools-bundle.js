@@ -3455,42 +3455,6 @@ hedotools.barchart = function() {
 	    .on('mousedown', function(event,d){
 		hedotools.barchartonclick.test(d,d[0]);
 	    });
-
-	// d3.select(window).on("resize.shiftplot",resizeshift);
-	
-	// function resizeshift() {
-	// 	figwidth = parseInt(d3.select("#shift01").style('width')) - margin.left - margin.right,
-	// 	width = .775*figwidth
-	// 	figcenter = width/2;
-
-	// 	canvas.attr("width",figwidth);
-
-	// 	x.range([(sortedWords[0].length+3)*9, width-(sortedWords[0].length+3)*9]);
-	// 	topScale.range([width*.1,width*.9]);
-
-	// 	bgrect.attr("width",width);
-	// 	//axes.attr("transform", "translate(" + (0.125 * figwidth) + "," +
-	// 	//      ((1 - 0.125 - 0.775) * figheight) + ")");
-	
-	// 	// mainline.attr("d",line);
-
-	// 	// fix the x axis
-	// 	canvas.select(".x.axis").call(xAxis);
-
-	// 	clip.attr("width",width);
-
-	// 	// get the x label
-	// 	xlabel.attr("x",(leftOffsetStatic+width/2));
-
-	// 	// the andy reagan credit
-	// 	credit.attr("x",width-7);
-
-	// 	// line separating summary
-	// 	sepline.attr("x2",width);
-
-	// 	// all of the lower shift text
-	// 	axes.selectAll("text.shifttext").attr("x",function(d,i) { if (d>0) {return x(d)+2;} else {return x(d)-2; } } );
-	// }
     };
 
     var opublic = { setfigure: setfigure,
@@ -3696,15 +3660,6 @@ hedotools.lens = function() {
 		.attr("font-size", "12.0px")
 		.attr("fill", "#000000")
 		.attr("transform", "rotate(-90.0," + (figwidth-width)/4 + "," + (figheight/2+30) + ")");
-
-	    // var xlabel = canvas.append("text")
-	    // 	.text("Word score")
-	    // 	.attr("class","axes-text")
-	    // 	.attr("x",width/2+(figwidth-width)/2)
-	    // 	.attr("y",figheight)
-	    // 	.attr("font-size", "12.0px")
-	    // 	.attr("fill", "#000000")
-	    // 	.attr("style", "text-anchor: middle;");
 
 	    var lensMean = d3.mean(lens);
 
@@ -4165,35 +4120,6 @@ hedotools.map = function() {
 		d3.selectAll(".state").attr("stroke-width",0.7);
 	    }
 
-	    //.text("Average Happiness h").append("tspan").attr("baseline-shift","sub").text("avg");
-
-	    
-
-	    // if (shiftRef !== i) {
-	    //     //console.log("reference "+allData[i].name);
-	    //     shiftRef = i;
-	    //     d3.selectAll(".state.map").attr("stroke-width",".7");
-	    //     d3.selectAll(".state.list").attr("stroke","none");
-	    //     d3.selectAll(".state."+allData[i].name[0]+allData[i].name.split(" ")[allData[i].name.split(" ").length-1])
-	    // 	.attr("stroke-width",3);
-	    // }
-	    // else { 
-	    //     //console.log("reference everything");
-	    //     shiftRef = 51;
-	    //     d3.selectAll(".state.map").attr("stroke-width","0.7");
-	    //     d3.selectAll(".state.list").attr("stroke","none");
-	    //         //.attr("stroke-width",3);
-	    // }
-	    
-	    // if (shiftRef !== shiftComp) {
-	    //     shiftObj = shift(allData[shiftRef].freq,allData[shiftComp].freq,lens,words);
-	    //     plotShift(d3.select('#shift01'),shiftObj.sortedMag.slice(0,200),
-	    // 	      shiftObj.sortedType.slice(0,200),
-	    // 	      shiftObj.sortedWords.slice(0,200),
-	    // 	      shiftObj.sumTypes,
-	    // 	      shiftObj.refH,
-	    // 	      shiftObj.compH);
-	    // }
 	}
 
 	function state_hover(event,d) { var i = stateFeatures.indexOf(d);
@@ -4350,12 +4276,6 @@ hedotools.map = function() {
 	    d3.select(".hoverinfogroup").remove();
 
 	    if (activeHover) {
-		// next line verifies that the data and json line up
-		// console.log(d.properties.name); console.log(allData[i].name.split(" ")[allData[i].name.split(" ").length-1]); 
-		// shiftComp = i;
-		//console.log(".state.list."+allData[i].name[0]+allData[i].name.split(" ")[allData[i].name.split(" ").length-1]);
-		//d3.selectAll(".state.list."+allData[i].name[0]+allData[i].name.split(" ")[allData[i].name.split(" ").length-1])
-		//.style("fill",null);
 		d3.select(this)
 		    .style("fill",null);
 	    }
@@ -4595,12 +4515,6 @@ hedotools.sankey = function() {
 	    .attr("height", height)
 	    .attr("class", "main");
 
-	// if (useTip) {
-	//     console.log("setting tip");
-	//     tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
-	//     axes.call(tip);
-	// }
-
 	oldstateselection = axes.selectAll("text.statetext.old")
 	    .data(data)
 	    .enter()
@@ -4676,12 +4590,6 @@ hedotools.sankey = function() {
 		    .attr("class", function(d,i) { return "r"+classColor(data[i].oldindex)+"-8"; })
 		    .attr("stroke-width", function(d,i) { return pathwidth(Math.abs(data[i].change)); })
 	    .on("mouseover", function(event,d) { var i = sankeydata.indexOf(d);
-		// console.log(i);
-		// console.log(data[i]);
-		// var rectSelection = d3.select(this)
-		//     .style({'opacity':'0.7',
-		// 	    // 'stroke-width':'1.0',
-		// 	   });
 
 		var thispath = this;
 
