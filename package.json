@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint js",
     "build": "bash bundle.sh",
-    "test:unit": "vitest run --passWithNoTests",
+    "test:unit": "vitest run",
     "pretest:browser": "npm run build",
     "test:browser": "playwright test",
     "test": "npm run lint && npm run test:unit && npm run test:browser",
