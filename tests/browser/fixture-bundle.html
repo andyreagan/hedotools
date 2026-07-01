@@ -14,18 +14,14 @@
     <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="../../node_modules/topojson-client/dist/topojson-client.min.js"></script>
     <script src="../../dist/hedotools-bundle.js"></script>
+    <script src="_fixture-data.js"></script>
 
     <script type="text/javascript">
         // Render a shift through the bundled hedotools.shifter to prove the
         // whole namespace wired up (d3-shifterator inlined -> hedotools.shifter).
-        function hash(n) { var r = Math.sin(n) * 43758.5453; return r - Math.floor(r); }
-        var N = 200, words = [], lens = [], refF = [], compF = [];
-        for (var i = 0; i < N; i++) {
-            words.push("word" + i);
-            lens.push(1 + hash(i * 12.9898) * 8);
-            refF.push(10 + Math.floor(hash(i * 7.1) * 500));
-            compF.push(10 + Math.floor(hash(i * 3.7) * 500));
-        }
+        var N = 200;
+        var words = hedoTest.words(N), lens = hedoTest.lens(N);
+        var refF = hedoTest.freq(7, N), compF = hedoTest.freq(3, N);
         hedotools.shifter.shift(refF, compF, lens, words);
         hedotools.shifter.setfigure(d3.select("#shift01")).setText(["bundle smoke test"]).plot();
 

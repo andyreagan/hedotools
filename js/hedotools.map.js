@@ -301,35 +301,6 @@ hedotools.map = function() {
 		d3.selectAll(".state").attr("stroke-width",0.7);
 	    }
 
-	    //.text("Average Happiness h").append("tspan").attr("baseline-shift","sub").text("avg");
-
-	    
-
-	    // if (shiftRef !== i) {
-	    //     //console.log("reference "+allData[i].name);
-	    //     shiftRef = i;
-	    //     d3.selectAll(".state.map").attr("stroke-width",".7");
-	    //     d3.selectAll(".state.list").attr("stroke","none");
-	    //     d3.selectAll(".state."+allData[i].name[0]+allData[i].name.split(" ")[allData[i].name.split(" ").length-1])
-	    // 	.attr("stroke-width",3);
-	    // }
-	    // else { 
-	    //     //console.log("reference everything");
-	    //     shiftRef = 51;
-	    //     d3.selectAll(".state.map").attr("stroke-width","0.7");
-	    //     d3.selectAll(".state.list").attr("stroke","none");
-	    //         //.attr("stroke-width",3);
-	    // }
-	    
-	    // if (shiftRef !== shiftComp) {
-	    //     shiftObj = shift(allData[shiftRef].freq,allData[shiftComp].freq,lens,words);
-	    //     plotShift(d3.select('#shift01'),shiftObj.sortedMag.slice(0,200),
-	    // 	      shiftObj.sortedType.slice(0,200),
-	    // 	      shiftObj.sortedWords.slice(0,200),
-	    // 	      shiftObj.sumTypes,
-	    // 	      shiftObj.refH,
-	    // 	      shiftObj.compH);
-	    // }
 	}
 
 	function state_hover(event,d) { var i = stateFeatures.indexOf(d);
@@ -486,12 +457,6 @@ hedotools.map = function() {
 	    d3.select(".hoverinfogroup").remove();
 
 	    if (activeHover) {
-		// next line verifies that the data and json line up
-		// console.log(d.properties.name); console.log(allData[i].name.split(" ")[allData[i].name.split(" ").length-1]); 
-		// shiftComp = i;
-		//console.log(".state.list."+allData[i].name[0]+allData[i].name.split(" ")[allData[i].name.split(" ").length-1]);
-		//d3.selectAll(".state.list."+allData[i].name[0]+allData[i].name.split(" ")[allData[i].name.split(" ").length-1])
-		//.style("fill",null);
 		d3.select(this)
 		    .style("fill",null);
 	    }
