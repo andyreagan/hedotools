@@ -28,9 +28,7 @@
     "dist",
     "js",
     "css",
-    "fonts",
-    "bundle.sh",
-    "code-versions.md"
+    "fonts"
   ],
   "devDependencies": {
     "@playwright/test": "1.61.1",

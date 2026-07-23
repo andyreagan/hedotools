@@ -2,8 +2,9 @@
 # this is just huge
 Mathjax*
 
-# tooling + build artifacts (dist/ IS committed — it's the published bundle)
+# tooling + build artifacts
 node_modules/
+/dist/
 /test-results/
 /playwright-report/
 *.tgz
