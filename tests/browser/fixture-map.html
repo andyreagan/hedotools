@@ -30,6 +30,7 @@
     <script src="../../js/hedotools.shifter.js"></script>
     <script src="../../js/hedotools.map.js"></script>
     <script src="../data/states-topo.js"></script>
+    <script src="_fixture-data.js"></script>
 
     <script type="text/javascript">
         // Page-level globals the map module + its hover->shift path expect
@@ -50,22 +51,13 @@
 
         // LabMT-scale word data so .shift() doesn't under-index (it needs more
         // words than its internal word count). Shared lens/words globals.
-        function hash(n) { var r = Math.sin(n) * 43758.5453; return r - Math.floor(r); }
-        var NWORDS = 200, words = [], lens = [];
-        for (var k = 0; k < NWORDS; k++) {
-            words.push("word" + k);
-            lens.push(1 + hash(k * 12.9898) * 8);
-        }
+        var NWORDS = 200;
+        var words = hedoTest.words(NWORDS), lens = hedoTest.lens(NWORDS);
         // 51 states + the US total at index 51, each with a frequency vector.
-        function freqVec(seed) {
-            var f = [];
-            for (var k = 0; k < NWORDS; k++) f.push(10 + Math.floor(hash((seed + 1) * 3.1 + k * 7.7) * 500));
-            return f;
-        }
         var allData = names.map(function (n, i) {
-            return { name: n, avhapps: 5.85 + ((i * 7) % 30) / 100, freq: freqVec(i), rawFreq: freqVec(i) };
+            return { name: n, avhapps: 5.85 + ((i * 7) % 30) / 100, freq: hedoTest.freq(i, NWORDS), rawFreq: hedoTest.freq(i, NWORDS) };
         });
-        allData.push({ name: "United States", avhapps: 6.0, freq: freqVec(99), rawFreq: freqVec(99) });
+        allData.push({ name: "United States", avhapps: 6.0, freq: hedoTest.freq(99, NWORDS), rawFreq: hedoTest.freq(99, NWORDS) });
 
         // Accessors return the factory, so call them as separate statements.
         var m = hedotools.map; // invoked singleton

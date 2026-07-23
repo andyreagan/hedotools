@@ -170,12 +170,6 @@ hedotools.sankey = function() {
 	    .attr("height", height)
 	    .attr("class", "main");
 
-	// if (useTip) {
-	//     console.log("setting tip");
-	//     tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
-	//     axes.call(tip);
-	// }
-
 	oldstateselection = axes.selectAll("text.statetext.old")
 	    .data(data)
 	    .enter()
@@ -251,12 +245,6 @@ hedotools.sankey = function() {
 		    .attr("class", function(d,i) { return "r"+classColor(data[i].oldindex)+"-8"; })
 		    .attr("stroke-width", function(d,i) { return pathwidth(Math.abs(data[i].change)); })
 	    .on("mouseover", function(event,d) { var i = sankeydata.indexOf(d);
-		// console.log(i);
-		// console.log(data[i]);
-		// var rectSelection = d3.select(this)
-		//     .style({'opacity':'0.7',
-		// 	    // 'stroke-width':'1.0',
-		// 	   });
 
 		var thispath = this;
 

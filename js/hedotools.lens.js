@@ -181,15 +181,6 @@ hedotools.lens = function() {
 		.attr("fill", "#000000")
 		.attr("transform", "rotate(-90.0," + (figwidth-width)/4 + "," + (figheight/2+30) + ")");
 
-	    // var xlabel = canvas.append("text")
-	    // 	.text("Word score")
-	    // 	.attr("class","axes-text")
-	    // 	.attr("x",width/2+(figwidth-width)/2)
-	    // 	.attr("y",figheight)
-	    // 	.attr("font-size", "12.0px")
-	    // 	.attr("fill", "#000000")
-	    // 	.attr("style", "text-anchor: middle;");
-
 	    var lensMean = d3.mean(lens);
 
 	    var bar = axes.selectAll(".distrect")
